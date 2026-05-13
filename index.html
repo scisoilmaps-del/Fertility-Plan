@@ -161,7 +161,111 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   margin-bottom: 8px;
 }
 .subnote { color: var(--sci-muted); font-size: 11px; margin: 4px 0 8px; }
+
+.compact-summary { padding: 10px 12px; }
+.compact-summary .card-title { margin-bottom: 8px; }
+.compact-summary h2 { font-size: 14px; }
+.compact-summary .help { display: none; }
+.compact-summary .summary-grid {
+  grid-template-columns: repeat(8, minmax(78px, 1fr));
+  gap: 5px;
+}
+.compact-summary .metric { padding: 6px 7px; border-radius: 9px; }
+.compact-summary .metric .label { font-size: 8px; letter-spacing: .08em; margin-bottom: 2px; }
+.compact-summary .metric .value { font-size: 12px; line-height: 1.15; }
+.compact-summary .metric .small { display: none; }
+.compact-summary #cropNPKWrap { margin-top: 6px !important; }
+.compact-summary #cropNPKTiles { grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); }
+.crop-pager {
+  background: var(--white);
+  border: 1px solid var(--sci-line);
+  border-radius: 14px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+.crop-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+.crop-tab {
+  border: 1px solid var(--sci-line);
+  background: #fff;
+  color: var(--sci-earth);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 850;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.crop-tab.active { background: var(--sci-leaf-deep); color: #fff; border-color: var(--sci-leaf-deep); }
+.crop-nav { display: flex; justify-content: space-between; gap: 8px; align-items: center; margin-top: 8px; }
+.crop-page-label { color: var(--sci-muted); font-size: 11px; font-weight: 750; }
+.crop-card { display: none; }
+.crop-card.active-crop { display: block; }
+
 .hidden { display: none !important; }
+
+@media (max-width: 1100px) {
+  .card, .crop-card { padding: 10px; border-radius: 12px; }
+  .card-title, .section-title { gap: 8px; }
+  .input-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .crop-head { grid-template-columns: 1fr; margin: -10px -10px 8px; padding: 10px; border-radius: 12px 12px 0 0; }
+  .crop-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+  .stat { padding: 6px 7px; }
+  .stat .value { font-size: 13px; }
+  .compact-summary .summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .table-wrap { overflow: visible; border: 0; border-radius: 0; }
+  table, table[style] { min-width: 0 !important; width: 100%; border-collapse: separate; border-spacing: 0; }
+  thead { display: none; }
+  tbody { display: grid; gap: 8px; }
+  tr.product-row, tr.micro-row, tr.amendment-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    background: #FDFBF7;
+    border: 1px solid #EFE7D7;
+    border-radius: 12px;
+    padding: 9px;
+  }
+  td {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-bottom: 0;
+    padding: 0;
+    background: transparent !important;
+    min-width: 0;
+  }
+  td::before {
+    color: var(--sci-muted);
+    font-size: 8.5px;
+    font-weight: 850;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    content: attr(data-label);
+  }
+  td.readonly {
+    min-height: 32px;
+    justify-content: center;
+    border: 1px solid var(--sci-line);
+    border-radius: 8px;
+    background: #fff !important;
+    padding: 6px 7px;
+  }
+  td:last-child { justify-content: end; }
+  td:last-child::before { content: ''; display: none; }
+  td:last-child .btn { width: 100%; min-height: 34px; }
+  .fertilizer-table td:nth-child(15), .micro-table td:nth-child(3), .micro-table td:nth-child(7), .amendment-table td:nth-child(7) { grid-column: 1 / -1; }
+}
+@media (max-width: 560px) {
+  .page { padding: 5px; }
+  .input-grid, .summary-grid, .crop-stats, .compact-summary .summary-grid { grid-template-columns: 1fr 1fr; }
+  tr.product-row, tr.micro-row, tr.amendment-row { grid-template-columns: 1fr; }
+  .card-title, .section-title { flex-direction: column; align-items: stretch; }
+  .actions, .crop-actions, .row-actions { width: 100%; }
+  .btn { width: 100%; }
+  .crop-nav { flex-direction: column; align-items: stretch; }
+  .crop-page-label { text-align: center; }
+}
+
 @media (max-width: 760px) {
   .page { padding: 6px; }
   .input-grid, .summary-grid, .crop-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -190,7 +294,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
     </div>
   </section>
 
-  <section class="card">
+  <section class="card compact-summary">
     <div class="card-title">
       <div><h2>Quick Summary</h2><div class="help">Farm-level fertilizer units based on product rates, unit conversions, N-P-K percentages, and crop acres.</div></div>
       <div class="actions"><button class="btn ghost" id="addCropBtn" type="button">Add Crop</button></div>
@@ -206,7 +310,16 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
       <div class="metric"><div class="label">Avg P / Acre</div><div class="value" id="farmAvgP">0.00</div><div class="small">Weighted average</div></div>
       <div class="metric"><div class="label">Avg K / Acre</div><div class="value" id="farmAvgK">0.00</div><div class="small">Weighted average</div></div>
     </div>
-    <div style="margin-top:10px"><div class="label" style="margin-bottom:6px">N-P-K Per Crop</div><div class="summary-grid" id="cropNPKTiles"></div></div>
+    <div id="cropNPKWrap" style="margin-top:10px"><div class="label" style="margin-bottom:6px">N-P-K Per Crop</div><div class="summary-grid" id="cropNPKTiles"></div></div>
+  </section>
+
+  <section class="crop-pager" id="cropPager">
+    <div class="crop-tabs" id="cropTabs"></div>
+    <div class="crop-nav">
+      <button class="btn ghost" id="prevCropBtn" type="button">Previous Crop</button>
+      <div class="crop-page-label" id="cropPageLabel">Crop 1 of 1</div>
+      <button class="btn ghost" id="nextCropBtn" type="button">Next Crop</button>
+    </div>
   </section>
 
   <main id="crops"></main>
@@ -231,7 +344,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
       <div><h3>Fertilizer Products</h3><div class="help">Use lbs or tons when you want N-P-K units calculated. Fluid oz and gallons are included in the CSV, but nutrient units need a weight equivalent.</div></div>
     </div>
     <div class="table-wrap">
-      <table>
+      <table class="fertilizer-table">
         <thead>
           <tr>
             <th style="width:170px">Product Name</th>
@@ -261,7 +374,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
       <div><h3>Optional Fertility Pack / Micronutrients</h3><div class="help">Type what the pack contains, rate per acre, and unit.</div></div>
     </div>
     <div class="table-wrap">
-      <table style="min-width:760px">
+      <table class="micro-table" style="min-width:760px">
         <thead>
           <tr>
             <th style="width:210px">Pack / Product Name</th>
@@ -283,7 +396,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
       <div><h3>Compost, Manure, or Biochar Applications</h3><div class="help">Track organic amendments separately from N-P-K fertilizer calculations.</div></div>
     </div>
     <div class="table-wrap">
-      <table style="min-width:880px">
+      <table class="amendment-table" style="min-width:880px">
         <thead>
           <tr>
             <th>Application Type</th>
@@ -305,54 +418,55 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
 
 <template id="productTemplate">
   <tr class="product-row">
-    <td><input class="product-name" placeholder="Urea, DAP, potash..." /></td>
-    <td><input class="application-date product-date" type="date" /></td>
-    <td><input class="product-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
-    <td><select class="product-unit"><option>lbs</option><option>Tons</option><option>Gallons</option><option>Fluid oz</option></select></td>
-    <td class="readonly product-lbs-eq">0.00</td>
-    <td><input class="n-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
-    <td><input class="p-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
-    <td><input class="k-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
-    <td class="readonly n-acre">0.00</td>
-    <td class="readonly p-acre">0.00</td>
-    <td class="readonly k-acre">0.00</td>
-    <td class="readonly n-total">0.00</td>
-    <td class="readonly p-total">0.00</td>
-    <td class="readonly k-total">0.00</td>
-    <td><input class="notes" placeholder="Optional" /></td>
-    <td><button class="btn danger remove-product" type="button">×</button></td>
+    <td data-label="Product Name"><input class="product-name" placeholder="Urea, DAP, potash..." /></td>
+    <td data-label="Application Date"><input class="application-date product-date" type="date" /></td>
+    <td data-label="Rate / Acre"><input class="product-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
+    <td data-label="Unit"><select class="product-unit"><option>lbs</option><option>Tons</option><option>Gallons</option><option>Fluid oz</option></select></td>
+    <td data-label="Equivalent lbs / Acre" class="readonly product-lbs-eq">0.00</td>
+    <td data-label="N %"><input class="n-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
+    <td data-label="P %"><input class="p-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
+    <td data-label="K %"><input class="k-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
+    <td data-label="Units N / Acre" class="readonly n-acre">0.00</td>
+    <td data-label="Units P / Acre" class="readonly p-acre">0.00</td>
+    <td data-label="Units K / Acre" class="readonly k-acre">0.00</td>
+    <td data-label="Total N Units" class="readonly n-total">0.00</td>
+    <td data-label="Total P Units" class="readonly p-total">0.00</td>
+    <td data-label="Total K Units" class="readonly k-total">0.00</td>
+    <td data-label="Notes"><input class="notes" placeholder="Optional" /></td>
+    <td data-label=""><button class="btn danger remove-product" type="button">×</button></td>
   </tr>
 </template>
 
 <template id="microTemplate">
   <tr class="micro-row">
-    <td><input class="micro-name" placeholder="Micronutrient pack" /></td>
-    <td><input class="application-date micro-date" type="date" /></td>
-    <td><input class="micro-contains" placeholder="Boron, zinc, manganese, sulfur..." /></td>
-    <td><input class="micro-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
-    <td><select class="micro-unit"><option>lbs</option><option>Fluid oz</option><option>Tons</option><option>Gallons</option></select></td>
-    <td class="readonly micro-total">0.00</td>
-    <td><input class="micro-notes" placeholder="Optional" /></td>
-    <td><button class="btn danger remove-micro" type="button">×</button></td>
+    <td data-label="Pack / Product Name"><input class="micro-name" placeholder="Micronutrient pack" /></td>
+    <td data-label="Application Date"><input class="application-date micro-date" type="date" /></td>
+    <td data-label="What It Contains"><input class="micro-contains" placeholder="Boron, zinc, manganese, sulfur..." /></td>
+    <td data-label="Rate / Acre"><input class="micro-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
+    <td data-label="Unit"><select class="micro-unit"><option>lbs</option><option>Fluid oz</option><option>Tons</option><option>Gallons</option></select></td>
+    <td data-label="Total Product" class="readonly micro-total">0.00</td>
+    <td data-label="Notes"><input class="micro-notes" placeholder="Optional" /></td>
+    <td data-label=""><button class="btn danger remove-micro" type="button">×</button></td>
   </tr>
 </template>
 
 <template id="amendmentTemplate">
   <tr class="amendment-row">
-    <td><select class="amendment-type"><option>Compost</option><option>Manure</option><option>Biochar</option></select></td>
-    <td><input class="application-date amendment-date" type="date" /></td>
-    <td><input class="amendment-name" placeholder="Product, source, or blend" /></td>
-    <td><input class="amendment-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
-    <td><select class="amendment-unit"><option>Tons</option><option>lbs</option><option>Gallons</option><option>Fluid oz</option></select></td>
-    <td class="readonly amendment-total">0.00</td>
-    <td><input class="amendment-notes" placeholder="Optional" /></td>
-    <td><button class="btn danger remove-amendment" type="button">×</button></td>
+    <td data-label="Application Type"><select class="amendment-type"><option>Compost</option><option>Manure</option><option>Biochar</option></select></td>
+    <td data-label="Application Date"><input class="application-date amendment-date" type="date" /></td>
+    <td data-label="Product / Source"><input class="amendment-name" placeholder="Product, source, or blend" /></td>
+    <td data-label="Rate / Acre"><input class="amendment-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
+    <td data-label="Unit"><select class="amendment-unit"><option>Tons</option><option>lbs</option><option>Gallons</option><option>Fluid oz</option></select></td>
+    <td data-label="Total Product" class="readonly amendment-total">0.00</td>
+    <td data-label="Notes"><input class="amendment-notes" placeholder="Optional" /></td>
+    <td data-label=""><button class="btn danger remove-amendment" type="button">×</button></td>
   </tr>
 </template>
 
 <script>
 const MAX_CROPS = 10;
 let cropCounter = 0;
+let activeCropIndex = 0;
 
 const $ = (sel, root = document) => root.querySelector(sel);
 const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
@@ -422,6 +536,40 @@ function desiredCropCount() {
   return count;
 }
 
+
+function cropDisplayName(crop, index) {
+  const name = $('.crop-name', crop)?.value.trim();
+  return name || `Crop ${index + 1}`;
+}
+
+function renderCropPager() {
+  const crops = $$('.crop-card');
+  if (activeCropIndex >= crops.length) activeCropIndex = Math.max(0, crops.length - 1);
+  if (activeCropIndex < 0) activeCropIndex = 0;
+
+  const tabs = $('#cropTabs');
+  tabs.innerHTML = '';
+  crops.forEach((crop, index) => {
+    crop.classList.toggle('active-crop', index === activeCropIndex);
+    const tab = document.createElement('button');
+    tab.type = 'button';
+    tab.className = `crop-tab${index === activeCropIndex ? ' active' : ''}`;
+    tab.textContent = cropDisplayName(crop, index);
+    tab.addEventListener('click', () => showCrop(index));
+    tabs.appendChild(tab);
+  });
+
+  $('#cropPager').classList.toggle('hidden', crops.length === 0);
+  $('#cropPageLabel').textContent = crops.length ? `Crop ${activeCropIndex + 1} of ${crops.length}` : 'No crops';
+  $('#prevCropBtn').disabled = activeCropIndex <= 0;
+  $('#nextCropBtn').disabled = activeCropIndex >= crops.length - 1;
+}
+
+function showCrop(index) {
+  activeCropIndex = index;
+  renderCropPager();
+}
+
 function syncCropCardsToCount() {
   const target = desiredCropCount();
   while ($$('.crop-card').length < target) {
@@ -432,6 +580,7 @@ function syncCropCardsToCount() {
     const all = $$('.crop-card');
     all[all.length - 1].remove();
   }
+  renderCropPager();
   calculateAll();
 }
 
@@ -459,13 +608,18 @@ function addCrop(name = '', acres = '') {
     calculateAll();
   });
   $('.remove-crop', crop).addEventListener('click', () => {
+    const removedIndex = $$('.crop-card').indexOf(crop);
     crop.remove();
     $('#cropCount').value = String(Math.max(1, $$('.crop-card').length));
+    activeCropIndex = Math.min(removedIndex, Math.max(0, $$('.crop-card').length - 1));
+    renderCropPager();
     calculateAll();
   });
   crop.addEventListener('input', calculateAll);
   crop.addEventListener('change', calculateAll);
   $('#crops').appendChild(crop);
+  activeCropIndex = $$('.crop-card').length - 1;
+  renderCropPager();
   calculateAll();
 }
 
@@ -622,6 +776,7 @@ function calculateAll() {
     warn.classList.add('hidden');
     warn.textContent = '';
   }
+  renderCropPager();
 }
 
 function csvEscape(value) {
@@ -783,11 +938,15 @@ function downloadCsv() {
   URL.revokeObjectURL(url);
 }
 
+$('#prevCropBtn').addEventListener('click', () => showCrop(activeCropIndex - 1));
+$('#nextCropBtn').addEventListener('click', () => showCrop(activeCropIndex + 1));
+
 $('#addCropBtn').addEventListener('click', () => {
   const current = $$('.crop-card').length;
   if (current < MAX_CROPS) {
     $('#cropCount').value = String(current + 1);
     syncCropCardsToCount();
+    showCrop($$('.crop-card').length - 1);
   }
 });
 $('#exportCsvBtn').addEventListener('click', downloadCsv);
