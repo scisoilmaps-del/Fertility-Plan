@@ -6,19 +6,36 @@
 <title>SCI Fertilizer Inputs Calculator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+
 :root {
-  --sci-earth: #3D2F1E;
-  --sci-clay: #A8551F;
-  --sci-leaf: #3F5C3A;
-  --sci-leaf-deep: #2B4028;
-  --sci-line: #DED3BB;
-  --sci-soft: #FBF8F1;
-  --sci-muted: #6B6458;
-  --sci-ink: #1C1A16;
-  --warn-bg: #FFF3D6;
-  --white: #fff;
+  --soil:   #22362C;
+  --earth:  #33483B;
+  --bark:   #526654;
+  --clay:   #A96F3C;
+  --wheat:  #D7B36A;
+  --cream:  #F8F5EC;
+  --parchment: #EFE9DA;
+  --line:   #D9D2C3;
+  --muted:  #6F766B;
+  --leaf:   #315C42;
+  --sage:   #6F8F72;
+  --moss:   #8EA77D;
+  --fog:    #F4F1E8;
+  --ink:    #1E2923;
+  --white:  #FFFFFF;
+  --warn-bg: #FFF7E8;
+  --warn-border: #D9A84E;
+  --danger: #8A3A2A;
+  --sci-earth: var(--soil);
+  --sci-clay: var(--clay);
+  --sci-leaf: var(--leaf);
+  --sci-leaf-deep: var(--soil);
+  --sci-line: var(--line);
+  --sci-soft: var(--cream);
+  --sci-muted: var(--muted);
+  --sci-ink: var(--ink);
 }
 * { box-sizing: border-box; }
 html, body {
@@ -28,7 +45,7 @@ html, body {
   overflow-x: hidden;
   background: transparent;
   color: var(--sci-ink);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.45;
   font-size: 13px;
 }
@@ -38,7 +55,7 @@ button { touch-action: manipulation; }
 .card, .crop-card {
   background: var(--white);
   border: 1px solid var(--sci-line);
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 14px;
   margin-bottom: 10px;
 }
@@ -53,7 +70,7 @@ button { touch-action: manipulation; }
 h2, h3, h4 {
   margin: 0;
   color: var(--sci-earth);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-weight: 800;
   letter-spacing: -.01em;
 }
@@ -79,7 +96,7 @@ input, select, textarea {
   max-width: 100%;
   min-height: 38px;
   border: 1px solid var(--sci-line);
-  border-radius: 10px;
+  border-radius: 6px;
   background: #fff;
   color: var(--sci-ink);
   padding: 8px 10px;
@@ -112,7 +129,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--sci-clay); box-s
 .actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .btn {
   border: 0;
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 8px 12px;
   color: #fff;
   background: var(--sci-leaf-deep);
@@ -134,7 +151,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--sci-clay); box-s
 .metric {
   background: #fff;
   border: 1px solid var(--sci-line);
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 8px;
 }
 .metric .label { margin-bottom: 4px; }
@@ -158,9 +175,9 @@ input:focus, select:focus, textarea:focus { border-color: var(--sci-clay); box-s
   gap: 8px;
   margin-bottom: 8px;
 }
-.stat { border: 1px solid var(--sci-line); background: #fff; border-radius: 10px; padding: 8px; }
+.stat { border: 1px solid var(--sci-line); background: #fff; border-radius: 6px; padding: 8px; }
 .stat .value { font-size: 16px; font-weight: 850; color: var(--sci-leaf-deep); }
-.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #EFE7D7; }
+.table-wrap { overflow-x: auto; border-radius: 6px; border: 1px solid #EFE7D7; }
 table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 1180px; }
 th {
   text-align: left;
@@ -183,7 +200,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   background: var(--warn-bg);
   color: var(--sci-earth);
   padding: 9px 11px;
-  border-radius: 10px;
+  border-radius: 6px;
   font-size: 12px;
   margin-bottom: 8px;
 }
@@ -197,7 +214,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   grid-template-columns: repeat(8, minmax(78px, 1fr));
   gap: 5px;
 }
-.compact-summary .metric { padding: 6px 7px; border-radius: 9px; }
+.compact-summary .metric { padding: 6px 7px; border-radius: 6px; }
 .compact-summary .metric .label { font-size: 8px; letter-spacing: .08em; margin-bottom: 2px; }
 .compact-summary .metric .value { font-size: 12px; line-height: 1.15; }
 .compact-summary .metric .small { display: none; }
@@ -206,7 +223,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
 .crop-pager {
   background: var(--white);
   border: 1px solid var(--sci-line);
-  border-radius: 14px;
+  border-radius: 8px;
   padding: 8px;
   margin-bottom: 10px;
 }
@@ -215,7 +232,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   border: 1px solid var(--sci-line);
   background: #fff;
   color: var(--sci-earth);
-  border-radius: 999px;
+  border-radius: 6px;
   padding: 6px 10px;
   font-size: 11px;
   font-weight: 850;
@@ -231,7 +248,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
 .hidden { display: none !important; }
 
 @media (max-width: 1100px) {
-  .card, .crop-card { padding: 10px; border-radius: 12px; }
+  .card, .crop-card { padding: 10px; border-radius: 7px; }
   .card-title, .section-title { gap: 8px; }
   .input-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .crop-head { grid-template-columns: 1fr; margin: -10px -10px 8px; padding: 10px; border-radius: 12px 12px 0 0; }
@@ -249,7 +266,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
     gap: 8px;
     background: #FDFBF7;
     border: 1px solid #EFE7D7;
-    border-radius: 12px;
+    border-radius: 7px;
     padding: 9px;
   }
   td {
@@ -311,7 +328,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
 .table-wrap { max-width: 100%; overflow-x: hidden; }
 @media (max-width: 760px) {
   .page { padding: 5px; }
-  .card, .crop-card, .crop-pager { border-radius: 12px; padding: 9px; margin-bottom: 8px; }
+  .card, .crop-card, .crop-pager { border-radius: 7px; padding: 9px; margin-bottom: 8px; }
   .input-grid { grid-template-columns: 1fr 1fr; gap: 7px; }
   .compact-summary .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
   .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -326,7 +343,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   input[type="date"] { height: 40px; min-height: 40px; padding: 8px 10px; }
   input[type="date"]::-webkit-date-and-time-value { min-height: 22px; line-height: 22px; }
   .btn { min-height: 38px; padding: 8px 10px; }
-  tr.product-row, tr.micro-row, tr.amendment-row { gap: 7px; padding: 8px; border-radius: 12px; }
+  tr.product-row, tr.micro-row, tr.amendment-row { gap: 7px; padding: 8px; border-radius: 7px; }
   td input, td select, td textarea { min-height: 40px; font-size: 16px; }
   td.readonly { min-height: 40px; }
 }
@@ -342,54 +359,165 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   .crop-tab { padding: 7px 10px; }
 }
 
+
+
+/* Tillage-tool style screen flow */
+.screen { display: none; flex-direction: column; min-height: 100vh; }
+.screen.active { display: flex; }
+.home-content { max-width: 760px; margin: 0 auto; padding: 14px 8px 18px; }
+.feature-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.feature-item { display:flex; gap:10px; align-items:flex-start; background: var(--cream); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.fi-icon { width: 34px; height: 34px; display:flex; align-items:center; justify-content:center; background: var(--parchment); border-radius: 6px; }
+.fi-head { font-weight: 800; color: var(--soil); font-size: 13px; }
+.fi-sub { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.app-bar { background: var(--soil); color: var(--white); min-height: 50px; padding: 8px 10px; display:flex; align-items:center; gap:10px; position: sticky; top: 0; z-index: 10; }
+.app-bar-title { font-weight: 800; font-size: 15px; flex: 1; }
+.back-btn, .app-bar-action { border: 1px solid rgba(255,255,255,.22); background: rgba(255,255,255,.08); color: var(--white); border-radius: 6px; min-height: 34px; padding: 7px 10px; font-weight: 800; }
+.back-btn { width: 36px; padding: 0; }
+.step-bar { display:flex; align-items:center; justify-content:center; gap: 8px; background: var(--cream); border-bottom: 1px solid var(--line); padding: 8px; }
+.step-item { display:flex; align-items:center; gap:6px; color: var(--muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+.step-dot { width: 9px; height:9px; border-radius: 4px; background: var(--line); }
+.step-item.active { color: var(--leaf); }
+.step-item.active .step-dot, .step-item.done .step-dot { background: var(--leaf); }
+.content { width: 100%; max-width: 980px; margin: 0 auto; padding: 10px 8px 16px; }
+.content-wide { width: 100%; max-width: 1180px; margin: 0 auto; padding: 8px 6px 16px; }
+.section-head { margin: 6px 0 10px; }
+.section-head h2 { font-family:'DM Serif Display', Georgia, serif; font-size: 24px; font-weight: 400; color: var(--soil); }
+.section-head .sub { color: var(--muted); font-size: 13px; margin-top: 3px; }
+.btn-primary, .btn-secondary, .btn-clay, .btn-ghost { border: 0; border-radius: 6px; min-height: 44px; padding: 10px 14px; font-weight: 800; }
+.btn-primary { width:100%; background: var(--leaf); color: var(--white); }
+.btn-secondary { background: var(--parchment); color: var(--soil); border: 1px solid var(--line); }
+.btn-clay { background: var(--clay); color: var(--white); }
+.btn-ghost { background: var(--cream); color: var(--leaf); border: 1px solid var(--line); }
+.btn-row { display:flex; gap: 8px; margin-top: 10px; }
+.summary-report { display:grid; gap:10px; }
+.summary-report .summary-card { background: var(--white); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.summary-report .summary-title { font-family:'DM Serif Display', Georgia, serif; color: var(--soil); font-size: 22px; margin-bottom: 4px; }
+.summary-report .summary-sub { color: var(--muted); font-size: 12px; margin-bottom: 10px; }
+.summary-report .mini-grid { display:grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.summary-report .crop-summary-row { display:grid; grid-template-columns: 1.5fr repeat(5, 1fr); gap: 6px; align-items:center; border-top: 1px solid var(--line); padding: 8px 0; font-size: 12px; }
+.summary-report .crop-summary-row.header { font-weight: 800; color: var(--soil); text-transform: uppercase; letter-spacing: .04em; font-size: 10px; border-top: 0; }
+@media (max-width: 768px) {
+  .feature-list { grid-template-columns: 1fr; }
+  .summary-report .mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .summary-report .crop-summary-row { grid-template-columns: 1fr 1fr; }
+  .summary-report .crop-summary-row.header { display:none; }
+}
+@media (max-width: 520px) {
+  .step-item span { display:none; }
+  .app-bar-action { font-size: 12px; padding: 7px 8px; }
+  .btn-row { flex-direction: column; }
+}
+
 </style>
 </head>
+
 <body>
-<div class="page">
-  <section class="card">
-    <div class="card-title">
-      <div><h2>Farm Details</h2><div class="help">Enter farm acres, choose the number of crops, then add fertilizer, micronutrient, and organic input applications.</div></div>
-      <div class="actions"><button class="btn secondary" id="exportCsvBtn" type="button">Export CSV</button></div>
-    </div>
-    <div class="input-grid">
-      <div class="field"><label for="farmName">Farm Name</label><input id="farmName" placeholder="Example: ABC Farm" /></div>
-      <div class="field"><label for="state">State</label><select id="state"><option value="">Select state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option></select></div>
-      <div class="field"><label for="totalAcres">Total Acres</label><input id="totalAcres" type="number" min="0" step="0.01" placeholder="0" /></div>
-      <div class="field"><label for="preparedBy">Prepared By</label><input id="preparedBy" placeholder="Optional" /></div>
-      <div class="field"><label for="cropCount">Number of Crops</label><input id="cropCount" type="number" min="1" max="10" step="1" value="1" /></div>
-    </div>
-  </section>
 
-  <section class="card compact-summary">
-    <div class="card-title">
-      <div><h2>Quick Summary</h2><div class="help">Farm-level fertilizer units based on product rates, unit conversions, N-P-K percentages, and crop acres.</div></div>
-      <div class="actions"><button class="btn ghost" id="addCropBtn" type="button">Add Crop</button></div>
+<div class="screen active" id="screen-home">
+  <div class="home-content">
+    <div class="feature-list">
+      <div class="feature-item"><div class="fi-icon">🏡</div><div class="fi-text"><div class="fi-head">Farm Setup</div><div class="fi-sub">Name, state, total acres, and crop count</div></div></div>
+      <div class="feature-item"><div class="fi-icon">🌾</div><div class="fi-text"><div class="fi-head">Crop-by-Crop Entry</div><div class="fi-sub">Add fertilizer, micronutrient, and organic inputs per crop</div></div></div>
+      <div class="feature-item"><div class="fi-icon">📊</div><div class="fi-text"><div class="fi-head">Instant Fertility Summary</div><div class="fi-sub">Farm totals, weighted averages, and crop N-P-K</div></div></div>
+      <div class="feature-item"><div class="fi-icon">📥</div><div class="fi-text"><div class="fi-head">Export to CSV</div><div class="fi-sub">Download a clean spreadsheet for records</div></div></div>
     </div>
-    <div id="acreWarning" class="note hidden"></div>
-    <div class="summary-grid">
-      <div class="metric"><div class="label">Crop Acres Entered</div><div class="value" id="sumCropAcres">0.00</div><div class="small">Sum of crop acres</div></div>
-      <div class="metric"><div class="label">Remaining Acres</div><div class="value" id="remainingAcres">0.00</div><div class="small">Total acres minus crop acres</div></div>
-      <div class="metric"><div class="label">Total N Units</div><div class="value" id="farmTotalN">0.00</div><div class="small">Across crop acres</div></div>
-      <div class="metric"><div class="label">Total P Units</div><div class="value" id="farmTotalP">0.00</div><div class="small">Across crop acres</div></div>
-      <div class="metric"><div class="label">Total K Units</div><div class="value" id="farmTotalK">0.00</div><div class="small">Across crop acres</div></div>
-      <div class="metric"><div class="label">Avg N / Acre</div><div class="value" id="farmAvgN">0.00</div><div class="small">Weighted average</div></div>
-      <div class="metric"><div class="label">Avg P / Acre</div><div class="value" id="farmAvgP">0.00</div><div class="small">Weighted average</div></div>
-      <div class="metric"><div class="label">Avg K / Acre</div><div class="value" id="farmAvgK">0.00</div><div class="small">Weighted average</div></div>
-    </div>
-    <div id="cropNPKWrap" style="margin-top:10px"><div class="label" style="margin-bottom:6px">N-P-K Per Crop</div><div class="summary-grid" id="cropNPKTiles"></div></div>
-  </section>
-
-  <section class="crop-pager" id="cropPager">
-    <div class="crop-tabs" id="cropTabs"></div>
-    <div class="crop-nav">
-      <button class="btn ghost" id="prevCropBtn" type="button">Previous Crop</button>
-      <div class="crop-page-label" id="cropPageLabel">Crop 1 of 1</div>
-      <button class="btn ghost" id="nextCropBtn" type="button">Next Crop</button>
-    </div>
-  </section>
-
-  <main id="crops"></main>
+    <button class="btn-primary" onclick="goTo('setup')" style="margin-bottom:16px;">Get Started →</button>
+  </div>
 </div>
+
+<div class="screen" id="screen-setup">
+  <div class="app-bar">
+    <button class="back-btn" onclick="goTo('home')">←</button>
+    <span class="app-bar-title">Farm Setup</span>
+  </div>
+  <div class="step-bar">
+    <div class="step-item active"><div class="step-dot"></div><span>Setup</span></div>
+    <div class="step-item"><div class="step-dot"></div><span>Crops</span></div>
+    <div class="step-item"><div class="step-dot"></div><span>Summary</span></div>
+  </div>
+  <div class="content">
+    <div class="section-head">
+      <h2>Tell us about your farm</h2>
+      <div class="sub">Enter the basic farm information, choose the number of crops, then continue to crop inputs.</div>
+    </div>
+    <section class="card">
+      <div class="card-title"><div><h2>Farm Details</h2><div class="help">Keep this simple. The crop acres entered later will drive the fertility calculations.</div></div></div>
+      <div class="input-grid">
+        <div class="field"><label for="farmName">Farm Name</label><input id="farmName" placeholder="Example: ABC Farm" /></div>
+        <div class="field"><label for="state">State</label><select id="state"><option value="">Select state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option></select></div>
+        <div class="field"><label for="totalAcres">Total Acres</label><input id="totalAcres" type="number" min="0" step="0.01" placeholder="0" /></div>
+        <div class="field"><label for="preparedBy">Prepared By</label><input id="preparedBy" placeholder="Optional" /></div>
+        <div class="field"><label for="cropCount">Number of Crops</label><input id="cropCount" type="number" min="1" max="10" step="1" value="1" /></div>
+      </div>
+    </section>
+    <button class="btn-primary" onclick="goToSetupCrops()">Continue to Crops →</button>
+  </div>
+</div>
+
+<div class="screen" id="screen-crops">
+  <div class="app-bar">
+    <button class="back-btn" onclick="goTo('setup')">←</button>
+    <span class="app-bar-title" id="cropsBarTitle">Crop Inputs</span>
+    <button class="app-bar-action" onclick="goToSummary()">Summary →</button>
+  </div>
+  <div class="step-bar">
+    <div class="step-item done"><div class="step-dot"></div><span>Setup</span></div>
+    <div class="step-item active"><div class="step-dot"></div><span>Crops</span></div>
+    <div class="step-item"><div class="step-dot"></div><span>Summary</span></div>
+  </div>
+  <div class="content-wide">
+    <section class="card compact-summary">
+      <div class="card-title">
+        <div><h2>Quick Summary</h2><div class="help">Farm-level fertilizer units based on product rates, unit conversions, N-P-K percentages, and crop acres.</div></div>
+        <div class="actions"><button class="btn ghost" id="addCropBtn" type="button">Add Crop</button></div>
+      </div>
+      <div id="acreWarning" class="note hidden"></div>
+      <div class="summary-grid">
+        <div class="metric"><div class="label">Crop Acres Entered</div><div class="value" id="sumCropAcres">0.00</div><div class="small">Sum of crop acres</div></div>
+        <div class="metric"><div class="label">Remaining Acres</div><div class="value" id="remainingAcres">0.00</div><div class="small">Total acres minus crop acres</div></div>
+        <div class="metric"><div class="label">Total N Units</div><div class="value" id="farmTotalN">0.00</div><div class="small">Across crop acres</div></div>
+        <div class="metric"><div class="label">Total P Units</div><div class="value" id="farmTotalP">0.00</div><div class="small">Across crop acres</div></div>
+        <div class="metric"><div class="label">Total K Units</div><div class="value" id="farmTotalK">0.00</div><div class="small">Across crop acres</div></div>
+        <div class="metric"><div class="label">Avg N / Acre</div><div class="value" id="farmAvgN">0.00</div><div class="small">Weighted average</div></div>
+        <div class="metric"><div class="label">Avg P / Acre</div><div class="value" id="farmAvgP">0.00</div><div class="small">Weighted average</div></div>
+        <div class="metric"><div class="label">Avg K / Acre</div><div class="value" id="farmAvgK">0.00</div><div class="small">Weighted average</div></div>
+      </div>
+      <div id="cropNPKWrap" style="margin-top:10px"><div class="label" style="margin-bottom:6px">N-P-K Per Crop</div><div class="summary-grid" id="cropNPKTiles"></div></div>
+    </section>
+
+    <section class="crop-pager" id="cropPager">
+      <div class="crop-tabs" id="cropTabs"></div>
+      <div class="crop-nav">
+        <button class="btn ghost" id="prevCropBtn" type="button">Previous Crop</button>
+        <div class="crop-page-label" id="cropPageLabel">Crop 1 of 1</div>
+        <button class="btn ghost" id="nextCropBtn" type="button">Next Crop</button>
+      </div>
+    </section>
+    <main id="crops"></main>
+  </div>
+</div>
+
+<div class="screen" id="screen-summary">
+  <div class="app-bar">
+    <button class="back-btn" onclick="goTo('crops')">←</button>
+    <span class="app-bar-title">Summary Report</span>
+    <button class="app-bar-action" id="exportCsvBtn" type="button">Export CSV</button>
+  </div>
+  <div class="step-bar">
+    <div class="step-item done"><div class="step-dot"></div><span>Setup</span></div>
+    <div class="step-item done"><div class="step-dot"></div><span>Crops</span></div>
+    <div class="step-item active"><div class="step-dot"></div><span>Summary</span></div>
+  </div>
+  <div class="content">
+    <div id="summaryContent"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" style="flex:1" onclick="goTo('crops')">← Edit Crops</button>
+      <button class="btn-clay" style="flex:1" onclick="downloadCsv()">📥 Export CSV</button>
+    </div>
+  </div>
+</div>
+
 
 <template id="cropTemplate">
   <section class="crop-card" data-crop-id="">
@@ -529,7 +657,10 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   </tr>
 </template>
 
+
+
 <script>
+
 const MAX_CROPS = 10;
 let cropCounter = 0;
 let activeCropIndex = 0;
@@ -629,6 +760,66 @@ function renderCropPager() {
   $('#cropPageLabel').textContent = crops.length ? `Crop ${activeCropIndex + 1} of ${crops.length}` : 'No crops';
   $('#prevCropBtn').disabled = activeCropIndex <= 0;
   $('#nextCropBtn').disabled = activeCropIndex >= crops.length - 1;
+}
+
+function goTo(name) {
+  $$('.screen').forEach(s => s.classList.remove('active'));
+  const screen = document.getElementById('screen-' + name);
+  if (screen) screen.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  requestParentResize();
+}
+
+function goToSetupCrops() {
+  syncCropCardsToCount();
+  goTo('crops');
+}
+
+function buildSummaryHtml() {
+  calculateAll();
+  const farmName = $('#farmName').value.trim() || 'Farm';
+  const state = $('#state').value || 'Not selected';
+  const preparedBy = $('#preparedBy').value.trim() || 'Not entered';
+  const totalAcres = fmt(num($('#totalAcres').value));
+  const summaryMetrics = [
+    ['Total Acres', totalAcres],
+    ['Crop Acres', $('#sumCropAcres').textContent],
+    ['Remaining Acres', $('#remainingAcres').textContent],
+    ['Total N', $('#farmTotalN').textContent],
+    ['Total P', $('#farmTotalP').textContent],
+    ['Total K', $('#farmTotalK').textContent],
+    ['Avg N / Acre', $('#farmAvgN').textContent],
+    ['Avg P / Acre', $('#farmAvgP').textContent],
+    ['Avg K / Acre', $('#farmAvgK').textContent]
+  ];
+  const metricHtml = summaryMetrics.map(([label, value]) => `<div class="metric"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
+  const cropRows = $$('.crop-card').map((crop, index) => {
+    const name = $('.crop-name', crop).value.trim() || `Crop ${index + 1}`;
+    const acres = fmt(num($('.crop-acres', crop).value));
+    const n = $('.crop-n-acre', crop).textContent;
+    const p = $('.crop-p-acre', crop).textContent;
+    const k = $('.crop-k-acre', crop).textContent;
+    const products = $('.crop-products', crop).textContent;
+    const other = $('.crop-other-products', crop).textContent;
+    return `<div class="crop-summary-row"><div><strong>${name}</strong></div><div>${acres} ac</div><div>${n} N/ac</div><div>${p} P/ac</div><div>${k} K/ac</div><div>${products} fert. / ${other} other</div></div>`;
+  }).join('');
+  return `<div class="summary-report">
+    <div class="summary-card">
+      <div class="summary-title">Fertilizer Input Summary</div>
+      <div class="summary-sub">${farmName} • ${state} • Prepared by ${preparedBy}</div>
+      <div class="mini-grid">${metricHtml}</div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-title">Crop Breakdown</div>
+      <div class="crop-summary-row header"><div>Crop</div><div>Acres</div><div>N / Acre</div><div>P / Acre</div><div>K / Acre</div><div>Entries</div></div>
+      ${cropRows || '<div class="summary-sub">No crop entries yet.</div>'}
+    </div>
+  </div>`;
+}
+
+function goToSummary() {
+  $('#summaryContent').innerHTML = buildSummaryHtml();
+  goTo('summary');
 }
 
 function showCrop(index) {
@@ -1038,6 +1229,7 @@ window.addEventListener('load', requestParentResize);
 window.addEventListener('resize', requestParentResize);
 
 syncCropCardsToCount();
+
 </script>
 </body>
 </html>
