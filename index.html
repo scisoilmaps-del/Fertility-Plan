@@ -195,6 +195,10 @@ tbody tr:nth-child(even) td { background: #FDFBF7; }
 td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-radius: 8px; }
 .readonly { color: var(--sci-earth); font-weight: 800; white-space: nowrap; }
 .crop-actions, .row-actions { padding-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+.optional-add-actions { padding-top: 10px; margin-top: 2px; border-top: 1px solid #EFE7D7; }
+.optional-add-actions .btn { flex: 1 1 235px; }
+.optional-panel { margin-top: 8px; }
+.compact-title { margin-top: 0; padding-top: 2px; }
 .note {
   border-left: 4px solid var(--sci-clay);
   background: var(--warn-bg);
@@ -564,49 +568,56 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
     </div>
     <div class="crop-actions"><button class="btn ghost add-product" type="button">Add Fertilizer Product</button></div>
 
-    <div class="section-title">
-      <div><h3>Optional Fertility Pack / Micronutrients</h3><div class="help">Type what the pack contains, rate per acre, and unit.</div></div>
+    <div class="crop-actions optional-add-actions">
+      <button class="btn ghost add-micro" type="button">+ Add Optional Fertility Pack / Micronutrients</button>
+      <button class="btn ghost add-amendment" type="button">+ Add Optional Organic Input</button>
     </div>
-    <div class="table-wrap">
-      <table class="micro-table" style="min-width:760px">
-        <thead>
-          <tr>
-            <th style="width:210px">Pack / Product Name</th>
-            <th>Application Date</th>
-            <th style="width:360px">What It Contains</th>
-            <th>Rate / Acre</th>
-            <th>Unit</th>
-            <th>Total Product</th>
-            <th>Notes</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody class="micro-body"></tbody>
-      </table>
-    </div>
-    <div class="crop-actions"><button class="btn ghost add-micro" type="button">Add Fertility Pack</button></div>
 
-    <div class="section-title">
-      <div><h3>Organic Inputs</h3><div class="help">Track organic inputs separately from N-P-K fertilizer calculations.</div></div>
+    <div class="optional-panel micro-panel hidden">
+      <div class="section-title compact-title">
+        <div><h3>Fertility Pack / Micronutrients</h3><div class="help">Only shown when added.</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="micro-table" style="min-width:760px">
+          <thead>
+            <tr>
+              <th style="width:210px">Pack / Product Name</th>
+              <th>Application Date</th>
+              <th style="width:360px">What It Contains</th>
+              <th>Rate / Acre</th>
+              <th>Unit</th>
+              <th>Total Product</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="micro-body"></tbody>
+        </table>
+      </div>
     </div>
-    <div class="table-wrap">
-      <table class="amendment-table" style="min-width:880px">
-        <thead>
-          <tr>
-            <th>Application Type</th>
-            <th>Application Date</th>
-            <th>Product / Source</th>
-            <th>Rate / Acre</th>
-            <th>Unit</th>
-            <th>Total Product</th>
-            <th>Notes</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody class="amendment-body"></tbody>
-      </table>
+
+    <div class="optional-panel amendment-panel hidden">
+      <div class="section-title compact-title">
+        <div><h3>Organic Inputs</h3><div class="help">Only shown when added.</div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="amendment-table" style="min-width:880px">
+          <thead>
+            <tr>
+              <th>Application Type</th>
+              <th>Application Date</th>
+              <th>Product / Source</th>
+              <th>Rate / Acre</th>
+              <th>Unit</th>
+              <th>Total Product</th>
+              <th>Notes</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody class="amendment-body"></tbody>
+        </table>
+      </div>
     </div>
-    <div class="crop-actions"><button class="btn ghost add-amendment" type="button">Add Organic Input</button></div>
   </section>
 </template>
 
@@ -698,9 +709,9 @@ function createMicroRow() {
   row.addEventListener('input', calculateAll);
   row.addEventListener('change', calculateAll);
   $('.remove-micro', row).addEventListener('click', () => {
-    const body = row.closest('.micro-body');
-    if ($$('.micro-row', body).length > 1) row.remove();
-    else clearRow(row);
+    const crop = row.closest('.crop-card');
+    row.remove();
+    updateOptionalPanels(crop);
     calculateAll();
   });
   return row;
@@ -711,12 +722,20 @@ function createAmendmentRow() {
   row.addEventListener('input', calculateAll);
   row.addEventListener('change', calculateAll);
   $('.remove-amendment', row).addEventListener('click', () => {
-    const body = row.closest('.amendment-body');
-    if ($$('.amendment-row', body).length > 1) row.remove();
-    else clearRow(row);
+    const crop = row.closest('.crop-card');
+    row.remove();
+    updateOptionalPanels(crop);
     calculateAll();
   });
   return row;
+}
+
+function updateOptionalPanels(crop) {
+  if (!crop) return;
+  const hasMicro = $$('.micro-row', crop).length > 0;
+  const hasAmendment = $$('.amendment-row', crop).length > 0;
+  $('.micro-panel', crop)?.classList.toggle('hidden', !hasMicro);
+  $('.amendment-panel', crop)?.classList.toggle('hidden', !hasAmendment);
 }
 
 function clearRow(row) {
@@ -850,19 +869,18 @@ function addCrop(name = '', acres = '') {
   $('.crop-name', crop).value = name;
   $('.crop-acres', crop).value = acres;
   $('.fertilizer-body', crop).appendChild(createProductRow());
-  $('.micro-body', crop).appendChild(createMicroRow());
-  $('.amendment-body', crop).appendChild(createAmendmentRow());
-
   $('.add-product', crop).addEventListener('click', () => {
     $('.fertilizer-body', crop).appendChild(createProductRow());
     calculateAll();
   });
   $('.add-micro', crop).addEventListener('click', () => {
     $('.micro-body', crop).appendChild(createMicroRow());
+    updateOptionalPanels(crop);
     calculateAll();
   });
   $('.add-amendment', crop).addEventListener('click', () => {
     $('.amendment-body', crop).appendChild(createAmendmentRow());
+    updateOptionalPanels(crop);
     calculateAll();
   });
   $('.remove-crop', crop).addEventListener('click', () => {
@@ -980,6 +998,8 @@ function calculateAll() {
       $('.amendment-total', row).textContent = fmt(a.totalProduct);
       if (a.hasEntry) otherCount++;
     });
+
+    updateOptionalPanels(crop);
 
     $('.crop-n-acre', crop).textContent = fmt(cropNPerAcre);
     $('.crop-p-acre', crop).textContent = fmt(cropPPerAcre);
