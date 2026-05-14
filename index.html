@@ -528,23 +528,8 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
 }
 .compact-summary .metric .label { font-size: 6.5px !important; letter-spacing: .05em !important; }
 .compact-summary .metric .value { font-size: 10px !important; }
-/* Hide calculated output columns in the working entry table. Values still calculate for CSV/report. */
-.fertilizer-table th:nth-child(5),
-.fertilizer-table th:nth-child(9),
-.fertilizer-table th:nth-child(10),
-.fertilizer-table th:nth-child(11),
-.fertilizer-table th:nth-child(12),
-.fertilizer-table th:nth-child(13),
-.fertilizer-table th:nth-child(14),
-.fertilizer-table td:nth-child(5),
-.fertilizer-table td:nth-child(9),
-.fertilizer-table td:nth-child(10),
-.fertilizer-table td:nth-child(11),
-.fertilizer-table td:nth-child(12),
-.fertilizer-table td:nth-child(13),
-.fertilizer-table td:nth-child(14),
-.micro-table th:nth-child(6), .micro-table td:nth-child(6),
-.amendment-table th:nth-child(6), .amendment-table td:nth-child(6) {
+/* Hide calculated helper outputs in the working entry table. User-facing N-P-K totals remain editable inputs. */
+.fertilizer-table .calc-output {
   display: none !important;
 }
 @media (max-width: 1100px) {
@@ -576,6 +561,193 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   tr.product-row, tr.micro-row, tr.amendment-row { grid-template-columns: 1fr !important; }
 }
 
+
+
+/* Fertility tool QA/QC + compact same-style cleanup */
+.qa-box {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--clay);
+  background: #FFF8EA;
+  border-radius: 8px;
+  padding: 8px 10px;
+  margin: 8px 0;
+  color: var(--soil);
+  font-size: 12px;
+  font-weight: 700;
+}
+#screen-setup .input-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+#screen-setup .field:first-child { grid-column: 1 / -1; }
+.crop-stats, .compact-summary .summary-grid, #cropNPKWrap { display: none !important; }
+.compact-summary { padding: 0 !important; margin: 0 0 6px 0 !important; border: 0 !important; background: transparent !important; }
+.card, .crop-card, .crop-pager { border-radius: 8px !important; }
+.crop-head { padding: 8px !important; margin: -10px -10px 8px !important; gap: 8px !important; }
+.section-title { margin-top: 7px !important; margin-bottom: 5px !important; }
+.section-title h3 { font-size: 13px !important; }
+.section-title .help { font-size: 10.5px !important; line-height: 1.2 !important; }
+.crop-actions, .optional-add-actions { padding-top: 5px !important; gap: 6px !important; }
+.optional-add-actions { margin-top: 5px !important; }
+.table-wrap { border: 0 !important; overflow: visible !important; }
+tr.product-row, tr.micro-row, tr.amendment-row { position: relative; }
+.product-row.collapsed td:not(.entry-summary-cell),
+.micro-row.collapsed td:not(.entry-summary-cell),
+.amendment-row.collapsed td:not(.entry-summary-cell) { display: none !important; }
+.entry-summary-cell { padding: 0 !important; background: transparent !important; border: 0 !important; }
+.entry-summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  border: 1px solid var(--line); background: #FDFBF7; border-radius: 8px;
+  padding: 6px 8px; margin-bottom: 5px;
+}
+.entry-summary-title { font-weight: 850; color: var(--soil); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.entry-summary-sub { color: var(--muted); font-size: 10px; margin-top: 1px; }
+.entry-summary-actions .btn { min-height: 28px !important; height: 28px !important; padding: 3px 8px !important; font-size: 11px !important; width: auto !important; }
+.needs-attention .entry-summary { border-color: #B95B42; box-shadow: 0 0 0 3px rgba(185,91,66,.12); }
+@media (max-width: 1100px) {
+  tr.product-row, tr.micro-row, tr.amendment-row { grid-template-columns: repeat(4, minmax(0,1fr)) !important; gap: 5px !important; padding: 6px !important; }
+  .entry-summary-cell { grid-column: 1 / -1 !important; }
+  input, select, textarea, td input, td select, td textarea { min-height: 30px !important; height: 30px !important; padding: 4px 7px !important; font-size: 14px !important; border-radius: 6px !important; }
+  td::before { font-size: 7px !important; letter-spacing: .05em !important; }
+}
+@media (max-width: 760px) {
+  #screen-setup .input-grid { grid-template-columns: 1fr !important; }
+  tr.product-row, tr.micro-row, tr.amendment-row { grid-template-columns: repeat(2, minmax(0,1fr)) !important; }
+}
+@media (max-width: 420px) {
+  tr.product-row, tr.micro-row, tr.amendment-row { grid-template-columns: 1fr !important; }
+}
+
+
+
+/* FINAL FIX: compact card rows for fertilizer entry view on desktop and phone */
+.fertilizer-table,
+.micro-table,
+.amendment-table,
+.fertilizer-table thead,
+.micro-table thead,
+.amendment-table thead {
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+.fertilizer-table thead,
+.micro-table thead,
+.amendment-table thead { display: none !important; }
+.fertilizer-table tbody,
+.micro-table tbody,
+.amendment-table tbody {
+  display: grid !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+tr.product-row,
+tr.micro-row,
+tr.amendment-row {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 7px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  padding: 8px !important;
+  margin: 0 0 8px 0 !important;
+}
+tr.product-row > td,
+tr.micro-row > td,
+tr.amendment-row > td {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+  border: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+}
+tr.product-row > td::before,
+tr.micro-row > td::before,
+tr.amendment-row > td::before {
+  content: attr(data-label) !important;
+  color: var(--muted) !important;
+  font-size: 8.5px !important;
+  font-weight: 850 !important;
+  letter-spacing: .09em !important;
+  text-transform: uppercase !important;
+  line-height: 1.1 !important;
+}
+.entry-summary-cell {
+  grid-column: 1 / -1 !important;
+  display: block !important;
+}
+.entry-summary-cell::before,
+.calc-output::before,
+td[data-label=""]::before { display: none !important; content: '' !important; }
+.fertilizer-table .calc-output {
+  display: none !important;
+}
+.product-row td[data-label="Notes"],
+.micro-row td[data-label="What It Contains"],
+.micro-row td[data-label="Notes"],
+.amendment-row td[data-label="Notes"] {
+  grid-column: 1 / -1 !important;
+}
+td[data-label=""] { justify-content: end !important; }
+td[data-label=""] .btn {
+  width: 100% !important;
+  min-height: 32px !important;
+  padding: 4px 8px !important;
+}
+.product-row.collapsed td:not(.entry-summary-cell),
+.micro-row.collapsed td:not(.entry-summary-cell),
+.amendment-row.collapsed td:not(.entry-summary-cell) { display: none !important; }
+@media (max-width: 760px) {
+  tr.product-row,
+  tr.micro-row,
+  tr.amendment-row { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 460px) {
+  tr.product-row,
+  tr.micro-row,
+  tr.amendment-row { grid-template-columns: 1fr !important; }
+}
+
+
+
+/* FIX: Optional input units must stay visible. Entry summary cell shifts nth-child indexes, so never hide unit columns by number. */
+.micro-row td[data-label="Unit"],
+.amendment-row td[data-label="Unit"],
+.micro-row td[data-label="Total Product"],
+.amendment-row td[data-label="Total Product"] {
+  display: flex !important;
+}
+.micro-row td[data-label="Unit"] select,
+.amendment-row td[data-label="Unit"] select {
+  width: 100% !important;
+}
+.micro-row td[data-label="Total Product"],
+.amendment-row td[data-label="Total Product"] {
+  min-height: 30px !important;
+  align-self: end !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 6px !important;
+  padding: 6px 8px !important;
+  background: #FDFBF7 !important;
+  font-weight: 850 !important;
+  color: var(--soil) !important;
+}
+
+
+/* Remove optional Total Product tiles from entry view. Values still calculate/export in the background. */
+.micro-table th:nth-child(6),
+.amendment-table th:nth-child(6),
+.micro-row td[data-label="Total Product"],
+.amendment-row td[data-label="Total Product"] {
+  display: none !important;
+}
+
+
+.summary-report .optional-total-row { grid-template-columns: 1fr 1fr; }
+.summary-report .metric .value { overflow-wrap: anywhere; }
+
 </style>
 </head>
 
@@ -605,17 +777,18 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
   </div>
   <div class="content">
     <div class="section-head">
-      <h2>Tell us about your farm</h2>
-      <div class="sub">Enter the basic farm information, choose the number of crops, then continue to crop inputs.</div>
+      <h2>Farm details</h2>
+      <div class="sub">Enter only the basics needed to start.</div>
     </div>
+    <div id="setupQa" class="qa-box hidden"></div>
     <section class="card">
-      <div class="card-title"><div><h2>Farm Details</h2><div class="help">Keep this simple. The crop acres entered later will drive the fertility calculations.</div></div></div>
+      
       <div class="input-grid">
         <div class="field"><label for="farmName">Farm Name</label><input id="farmName" placeholder="Example: ABC Farm" /></div>
         <div class="field"><label for="state">State</label><select id="state"><option value="">Select state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option></select></div>
         <div class="field"><label for="totalAcres">Total Acres</label><input id="totalAcres" type="number" min="0" step="0.01" placeholder="0" /></div>
         <div class="field"><label for="preparedBy">Prepared By</label><input id="preparedBy" placeholder="Optional" /></div>
-        <div class="field"><label for="cropCount">Number of Crops</label><input id="cropCount" type="number" min="1" max="10" step="1" value="1" /></div>
+        <div class="field"><label for="cropCount">Number of Crops</label><input id="cropCount" type="number" min="1" max="10" step="1" placeholder="" inputmode="numeric" /></div>
       </div>
     </section>
     <button class="btn-primary" onclick="goToSetupCrops()">Continue to Crops →</button>
@@ -634,6 +807,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
     <div class="step-item"><div class="step-dot"></div><span>Summary</span></div>
   </div>
   <div class="content-wide">
+    <div id="cropQa" class="qa-box hidden"></div>
     <section class="card compact-summary">
       <div class="card-title">
         <div><h2>Summary</h2><div class="help">Farm-level fertilizer units based on product rates, unit conversions, N-P-K percentages, and crop acres.</div></div>
@@ -677,6 +851,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
     <div class="step-item active"><div class="step-dot"></div><span>Summary</span></div>
   </div>
   <div class="content">
+    <div id="summaryQa" class="qa-box hidden"></div>
     <div id="summaryContent"></div>
     <div class="btn-row">
       <button class="btn-secondary" style="flex:1" onclick="goTo('crops')">← Edit Crops</button>
@@ -702,7 +877,7 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
     </div>
 
     <div class="section-title">
-      <div><h3>Fertilizer Products</h3><div class="help">Use lbs or tons when you want N-P-K units calculated. Fluid oz and gallons are included in the CSV, but nutrient units need a weight equivalent.</div></div>
+      <div><h3>Fertilizer Products</h3><div class="help">Enter average product rate per acre and N-P-K percentages. Use 0 for any nutrient that does not apply.</div></div>
     </div>
     <div class="table-wrap">
       <table class="fertilizer-table">
@@ -712,16 +887,13 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
             <th>Application Date</th>
             <th>Rate / Acre</th>
             <th>Unit</th>
-            <th>Equivalent lbs / Acre</th>
+            <th class="calc-output">Equivalent lbs / Acre</th>
             <th>N %</th>
             <th>P %</th>
             <th>K %</th>
-            <th>Units N / Acre</th>
-            <th>Units P / Acre</th>
-            <th>Units K / Acre</th>
-            <th>Total N Units</th>
-            <th>Total P Units</th>
-            <th>Total K Units</th>
+            <th class="calc-output">Units N / Acre</th>
+            <th class="calc-output">Units P / Acre</th>
+            <th class="calc-output">Units K / Acre</th>
             <th>Notes</th>
             <th></th>
           </tr>
@@ -790,16 +962,13 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
     <td data-label="Application Date"><input class="application-date product-date" type="date" /></td>
     <td data-label="Rate / Acre"><input class="product-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
     <td data-label="Unit"><select class="product-unit"><option>lbs</option><option>Tons</option><option>Gallons</option><option>Fluid oz</option></select></td>
-    <td data-label="Equivalent lbs / Acre" class="readonly product-lbs-eq">0.00</td>
+    <td data-label="Equivalent lbs / Acre" class="readonly product-lbs-eq calc-output">0.00</td>
     <td data-label="N %"><input class="n-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
     <td data-label="P %"><input class="p-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
     <td data-label="K %"><input class="k-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
-    <td data-label="Units N / Acre" class="readonly n-acre">0.00</td>
-    <td data-label="Units P / Acre" class="readonly p-acre">0.00</td>
-    <td data-label="Units K / Acre" class="readonly k-acre">0.00</td>
-    <td data-label="Total N Units" class="readonly n-total">0.00</td>
-    <td data-label="Total P Units" class="readonly p-total">0.00</td>
-    <td data-label="Total K Units" class="readonly k-total">0.00</td>
+    <td data-label="Units N / Acre" class="readonly n-acre calc-output">0.00</td>
+    <td data-label="Units P / Acre" class="readonly p-acre calc-output">0.00</td>
+    <td data-label="Units K / Acre" class="readonly k-acre calc-output">0.00</td>
     <td data-label="Notes"><input class="notes" placeholder="Optional" /></td>
     <td data-label=""><button class="btn danger remove-product" type="button">×</button></td>
   </tr>
@@ -854,16 +1023,141 @@ function poundsEquivalent(rate, unit) {
   return 0;
 }
 
+
+function showBox(id, message) {
+  const box = $(id);
+  if (!box) return;
+  if (!message) { box.classList.add('hidden'); box.textContent = ''; return; }
+  box.textContent = message;
+  box.classList.remove('hidden');
+}
+function showSetupQA(message) { showBox('#setupQa', message); }
+function showCropQA(message) { showBox('#cropQa', message); }
+function showSummaryQA(message) { showBox('#summaryQa', message); }
+function rawValue(row, selector) { const el = $(selector, row); return el ? el.value.trim() : ''; }
+function validPctRaw(v) { if (v === '') return true; const n = num(v); return n >= 0 && n <= 100; }
+function pctValue(v) { return v === '' ? 0 : num(v); }
+function validateSetup() {
+  if (!$('#farmName').value.trim()) return { ok:false, message:'Add the farm name before continuing.', el:$('#farmName') };
+  if (!$('#state').value) return { ok:false, message:'Select the state before continuing.', el:$('#state') };
+  if (num($('#totalAcres').value) <= 0) return { ok:false, message:'Add total farm acres before continuing.', el:$('#totalAcres') };
+  if (!$('#cropCount').value.trim() || desiredCropCount() < 1) return { ok:false, message:'Add the number of crops before continuing.', el:$('#cropCount') };
+  return { ok:true, message:'' };
+}
+function productStarted(row) { return !!(rawValue(row,'.product-name') || rawValue(row,'.product-date') || rawValue(row,'.product-rate') || rawValue(row,'.n-pct') || rawValue(row,'.p-pct') || rawValue(row,'.k-pct') || rawValue(row,'.notes')); }
+function productComplete(row) {
+  const nRaw = rawValue(row,'.n-pct');
+  const pRaw = rawValue(row,'.p-pct');
+  const kRaw = rawValue(row,'.k-pct');
+  const n = pctValue(nRaw);
+  const p = pctValue(pRaw);
+  const k = pctValue(kRaw);
+  return !!(rawValue(row,'.product-name') && rawValue(row,'.product-date') && num(rawValue(row,'.product-rate')) > 0 && validPctRaw(nRaw) && validPctRaw(pRaw) && validPctRaw(kRaw) && (n + p + k) > 0);
+}
+function microStarted(row) { return !!(rawValue(row,'.micro-name') || rawValue(row,'.micro-date') || rawValue(row,'.micro-contains') || rawValue(row,'.micro-rate') || rawValue(row,'.micro-notes')); }
+function microComplete(row) { return !!(rawValue(row,'.micro-name') && rawValue(row,'.micro-date') && rawValue(row,'.micro-contains') && num(rawValue(row,'.micro-rate')) > 0); }
+function amendmentStarted(row) { return !!(rawValue(row,'.amendment-date') || rawValue(row,'.amendment-name') || rawValue(row,'.amendment-rate') || rawValue(row,'.amendment-notes')); }
+function amendmentComplete(row) { return !!(rawValue(row,'.amendment-date') && rawValue(row,'.amendment-name') && num(rawValue(row,'.amendment-rate')) > 0); }
+function validateJourney() {
+  const setup = validateSetup();
+  if (!setup.ok) return setup;
+  const crops = $$('.crop-card');
+  if (!crops.length) return { ok:false, message:'Add at least one crop before continuing.', el:$('#crops') };
+  const totalAcres = num($('#totalAcres').value);
+  const cropAcresTotal = crops.reduce((sum, crop) => sum + num($('.crop-acres', crop).value), 0);
+  if (totalAcres > 0 && Math.abs(totalAcres - cropAcresTotal) > 0.01) return { ok:false, message: totalAcres > cropAcresTotal ? `Crop acres are ${fmt(totalAcres - cropAcresTotal)} acres below total farm acres.` : `Crop acres exceed total farm acres by ${fmt(cropAcresTotal - totalAcres)} acres.`, el:$('#crops') };
+  let completeEntries = 0;
+  for (const [ci, crop] of crops.entries()) {
+    const name = $('.crop-name', crop).value.trim();
+    const acres = num($('.crop-acres', crop).value);
+    if (!name) { showCrop(ci); return { ok:false, message:'Add a crop name before continuing.', el:$('.crop-name', crop) }; }
+    if (acres <= 0) { showCrop(ci); return { ok:false, message:`Add acres for ${name}.`, el:$('.crop-acres', crop) }; }
+    for (const row of $$('.product-row', crop)) {
+      row.classList.remove('needs-attention');
+      if (productComplete(row)) completeEntries++;
+      else if (productStarted(row)) { showCrop(ci); row.classList.add('needs-attention'); openEntry(row); return { ok:false, message:`Finish the incomplete fertilizer entry for ${name}: product, date, rate/acre, and at least one N-P-K percentage above 0 are required. Blank P or K is treated as 0. Keep percentages from 0 to 100.`, el:row }; }
+    }
+    for (const row of $$('.micro-row', crop)) {
+      row.classList.remove('needs-attention');
+      if (microComplete(row)) completeEntries++;
+      else if (microStarted(row)) { showCrop(ci); row.classList.add('needs-attention'); openEntry(row); return { ok:false, message:`Finish the incomplete micronutrient entry for ${name}: name, date, contents, and rate/acre are required.`, el:row }; }
+    }
+    for (const row of $$('.amendment-row', crop)) {
+      row.classList.remove('needs-attention');
+      if (amendmentComplete(row)) completeEntries++;
+      else if (amendmentStarted(row)) { showCrop(ci); row.classList.add('needs-attention'); openEntry(row); return { ok:false, message:`Finish the incomplete organic input for ${name}: date, product/source, and rate/acre are required.`, el:row }; }
+    }
+  }
+  if (!completeEntries) return { ok:false, message:'Add at least one complete fertilizer or optional input before exporting.', el:$('#crops') };
+  return { ok:true, message:'' };
+}
+function entryTitle(row) {
+  if (row.classList.contains('product-row')) return rawValue(row,'.product-name') || 'Fertilizer Product';
+  if (row.classList.contains('micro-row')) return rawValue(row,'.micro-name') || 'Fertility Pack / Micronutrients';
+  return rawValue(row,'.amendment-name') || rawValue(row,'.amendment-type') || 'Organic Input';
+}
+function entrySub(row) {
+  const date = rawValue(row,'.product-date') || rawValue(row,'.micro-date') || rawValue(row,'.amendment-date');
+  const rate = rawValue(row,'.product-rate') || rawValue(row,'.micro-rate') || rawValue(row,'.amendment-rate');
+  const unit = rawValue(row,'.product-unit') || rawValue(row,'.micro-unit') || rawValue(row,'.amendment-unit');
+  const bits = [];
+  if (date) bits.push(date);
+  if (rate) bits.push(`${rate} ${unit}/ac`);
+  return bits.length ? bits.join(' · ') : 'Tap edit to open details';
+}
+function addEntrySummary(row) {
+  if ($('.entry-summary-cell', row)) return;
+  const td = document.createElement('td');
+  td.className = 'entry-summary-cell';
+  td.colSpan = 20;
+  td.innerHTML = '<div class="entry-summary"><div><div class="entry-summary-title">New Entry</div><div class="entry-summary-sub">Tap edit to open details</div></div><div class="entry-summary-actions"><button class="btn ghost edit-entry" type="button">Edit</button></div></div>';
+  row.insertBefore(td, row.firstChild);
+  $('.edit-entry', row).addEventListener('click', ev => { ev.stopPropagation(); openEntry(row); });
+  $('.entry-summary', row).addEventListener('click', ev => { if (ev.target.closest('button')) return; row.classList.toggle('collapsed'); });
+}
+function refreshEntrySummary(row) {
+  addEntrySummary(row);
+  $('.entry-summary-title', row).textContent = entryTitle(row);
+  $('.entry-summary-sub', row).textContent = entrySub(row);
+}
+function openEntry(row) {
+  const crop = row.closest('.crop-card');
+  if (crop) {
+    $$('.product-row, .micro-row, .amendment-row', crop).forEach(other => {
+      if (other !== row) {
+        refreshEntrySummary(other);
+        other.classList.add('collapsed');
+      }
+    });
+  }
+  row.classList.remove('collapsed');
+  refreshEntrySummary(row);
+  setTimeout(() => row.querySelector('input, select, textarea')?.focus(), 20);
+}
+function collapseCompletedEntries(crop) {
+  $$('.product-row', crop).forEach(row => { refreshEntrySummary(row); if (productComplete(row)) row.classList.add('collapsed'); });
+  $$('.micro-row', crop).forEach(row => { refreshEntrySummary(row); if (microComplete(row)) row.classList.add('collapsed'); });
+  $$('.amendment-row', crop).forEach(row => { refreshEntrySummary(row); if (amendmentComplete(row)) row.classList.add('collapsed'); });
+}
+
 function createProductRow() {
   const row = $('#productTemplate').content.firstElementChild.cloneNode(true);
-  row.addEventListener('input', calculateAll);
-  row.addEventListener('change', calculateAll);
+  addEntrySummary(row);
+  const refresh = () => {
+    row.classList.remove('needs-attention');
+    showCropQA('');
+    refreshEntrySummary(row);
+    calculateAll();
+  };
+  row.addEventListener('input', refresh);
+  row.addEventListener('change', refresh);
   $('.remove-product', row).addEventListener('click', () => {
     const body = row.closest('.fertilizer-body');
     if ($$('.product-row', body).length > 1) row.remove();
     else clearRow(row);
     calculateAll();
   });
+  refreshEntrySummary(row);
   return row;
 }
 
@@ -877,6 +1171,10 @@ function createMicroRow() {
     updateOptionalPanels(crop);
     calculateAll();
   });
+  addEntrySummary(row);
+  row.addEventListener('input', () => { row.classList.remove('needs-attention'); showCropQA(''); refreshEntrySummary(row); });
+  row.addEventListener('change', () => { row.classList.remove('needs-attention'); showCropQA(''); refreshEntrySummary(row); });
+  refreshEntrySummary(row);
   return row;
 }
 
@@ -890,6 +1188,10 @@ function createAmendmentRow() {
     updateOptionalPanels(crop);
     calculateAll();
   });
+  addEntrySummary(row);
+  row.addEventListener('input', () => { row.classList.remove('needs-attention'); showCropQA(''); refreshEntrySummary(row); });
+  row.addEventListener('change', () => { row.classList.remove('needs-attention'); showCropQA(''); refreshEntrySummary(row); });
+  refreshEntrySummary(row);
   return row;
 }
 
@@ -908,7 +1210,9 @@ function clearRow(row) {
 
 function desiredCropCount() {
   const input = $('#cropCount');
-  let count = Math.round(num(input.value));
+  const raw = input.value.trim();
+  if (!raw) return 0;
+  let count = Math.round(num(raw));
   if (!count || count < 1) count = 1;
   if (count > MAX_CROPS) count = MAX_CROPS;
   input.value = String(count);
@@ -953,8 +1257,49 @@ function goTo(name) {
 }
 
 function goToSetupCrops() {
+  const check = validateSetup();
+  if (!check.ok) { showSetupQA(check.message); check.el?.focus?.(); return; }
+  showSetupQA('');
   syncCropCardsToCount();
+  $('#cropsBarTitle').textContent = ($('#farmName').value.trim() || 'Farm') + ' — Crop Inputs';
   goTo('crops');
+}
+
+
+function summarizeOptionalInputTotals() {
+  const packByUnit = {};
+  const organicByTypeUnit = {};
+  const organicByUnit = {};
+  $$('.crop-card').forEach(crop => {
+    $$('.micro-row', crop).forEach(row => {
+      const m = getMicroData(crop, row);
+      if (!m.hasEntry) return;
+      packByUnit[m.unit] = (packByUnit[m.unit] || 0) + m.totalProduct;
+    });
+    $$('.amendment-row', crop).forEach(row => {
+      const a = getAmendmentData(crop, row);
+      if (!a.hasEntry) return;
+      const typeKey = `${a.amendmentType}||${a.unit}`;
+      organicByTypeUnit[typeKey] = (organicByTypeUnit[typeKey] || 0) + a.totalProduct;
+      organicByUnit[a.unit] = (organicByUnit[a.unit] || 0) + a.totalProduct;
+    });
+  });
+  return { packByUnit, organicByTypeUnit, organicByUnit };
+}
+
+function formatUnitTotals(map) {
+  const entries = Object.entries(map).filter(([, value]) => Math.abs(value) > 0.000001);
+  if (!entries.length) return '0';
+  return entries.map(([unit, value]) => `${fmt(value)} ${unit}`).join(' / ');
+}
+
+function formatOrganicTypeTotals(map) {
+  const entries = Object.entries(map).filter(([, value]) => Math.abs(value) > 0.000001);
+  if (!entries.length) return '<div class="summary-sub">No organic inputs added.</div>';
+  return entries.map(([key, value]) => {
+    const [type, unit] = key.split('||');
+    return `<div class="crop-summary-row optional-total-row"><div><strong>${type}</strong></div><div>${fmt(value)} ${unit}</div></div>`;
+  }).join('');
 }
 
 function buildSummaryHtml() {
@@ -963,6 +1308,9 @@ function buildSummaryHtml() {
   const state = $('#state').value || 'Not selected';
   const preparedBy = $('#preparedBy').value.trim() || 'Not entered';
   const totalAcres = fmt(num($('#totalAcres').value));
+  const optionalTotals = summarizeOptionalInputTotals();
+  const packTotalText = formatUnitTotals(optionalTotals.packByUnit);
+  const organicTotalText = formatUnitTotals(optionalTotals.organicByUnit);
   const summaryMetrics = [
     ['Total Acres', totalAcres],
     ['Crop Acres', $('#sumCropAcres').textContent],
@@ -972,7 +1320,9 @@ function buildSummaryHtml() {
     ['Total K', $('#farmTotalK').textContent],
     ['Avg N / Acre', $('#farmAvgN').textContent],
     ['Avg P / Acre', $('#farmAvgP').textContent],
-    ['Avg K / Acre', $('#farmAvgK').textContent]
+    ['Avg K / Acre', $('#farmAvgK').textContent],
+    ['Pack / Micro Total', packTotalText],
+    ['Organic Total', organicTotalText]
   ];
   const metricHtml = summaryMetrics.map(([label, value]) => `<div class="metric"><div class="label">${label}</div><div class="value">${value}</div></div>`).join('');
   const cropRows = $$('.crop-card').map((crop, index) => {
@@ -996,10 +1346,29 @@ function buildSummaryHtml() {
       <div class="crop-summary-row header"><div>Crop</div><div>Acres</div><div>N / Acre</div><div>P / Acre</div><div>K / Acre</div><div>Entries</div></div>
       ${cropRows || '<div class="summary-sub">No crop entries yet.</div>'}
     </div>
+    <div class="summary-card">
+      <div class="summary-title">Optional Input Totals</div>
+      <div class="summary-sub">Totals are based on rate per acre × crop acres and grouped by unit.</div>
+      <div class="mini-grid">
+        <div class="metric"><div class="label">Fertility Pack / Micronutrients</div><div class="value">${packTotalText}</div></div>
+        <div class="metric"><div class="label">Organic Inputs</div><div class="value">${organicTotalText}</div></div>
+      </div>
+      <div class="crop-summary-row header" style="margin-top:10px"><div>Organic Type</div><div>Total Product</div></div>
+      ${formatOrganicTypeTotals(optionalTotals.organicByTypeUnit)}
+    </div>
   </div>`;
 }
 
 function goToSummary() {
+  calculateAll();
+  const check = validateJourney();
+  if (!check.ok) {
+    showCropQA(check.message);
+    if (check.el) check.el.scrollIntoView({ behavior:'smooth', block:'center' });
+    return;
+  }
+  showCropQA('');
+  showSummaryQA('Ready. Export the CSV and save or send it as needed.');
   $('#summaryContent').innerHTML = buildSummaryHtml();
   goTo('summary');
 }
@@ -1033,17 +1402,32 @@ function addCrop(name = '', acres = '') {
   $('.crop-acres', crop).value = acres;
   $('.fertilizer-body', crop).appendChild(createProductRow());
   $('.add-product', crop).addEventListener('click', () => {
-    $('.fertilizer-body', crop).appendChild(createProductRow());
+    const blank = $$('.product-row', crop).find(row => !productStarted(row));
+    if (blank) { openEntry(blank); showCropQA('Use the open blank fertilizer entry first, then add another.'); return; }
+    collapseCompletedEntries(crop);
+    const row = createProductRow();
+    $('.fertilizer-body', crop).appendChild(row);
+    openEntry(row);
     calculateAll();
   });
   $('.add-micro', crop).addEventListener('click', () => {
-    $('.micro-body', crop).appendChild(createMicroRow());
+    const blank = $$('.micro-row', crop).find(row => !microStarted(row));
+    if (blank) { openEntry(blank); showCropQA('Use the open blank micronutrient entry first, then add another.'); return; }
+    collapseCompletedEntries(crop);
+    const row = createMicroRow();
+    $('.micro-body', crop).appendChild(row);
     updateOptionalPanels(crop);
+    openEntry(row);
     calculateAll();
   });
   $('.add-amendment', crop).addEventListener('click', () => {
-    $('.amendment-body', crop).appendChild(createAmendmentRow());
+    const blank = $$('.amendment-row', crop).find(row => !amendmentStarted(row));
+    if (blank) { openEntry(blank); showCropQA('Use the open blank organic input first, then add another.'); return; }
+    collapseCompletedEntries(crop);
+    const row = createAmendmentRow();
+    $('.amendment-body', crop).appendChild(row);
     updateOptionalPanels(crop);
+    openEntry(row);
     calculateAll();
   });
   $('.remove-crop', crop).addEventListener('click', () => {
@@ -1054,8 +1438,8 @@ function addCrop(name = '', acres = '') {
     renderCropPager();
     calculateAll();
   });
-  crop.addEventListener('input', calculateAll);
-  crop.addEventListener('change', calculateAll);
+  crop.addEventListener('input', () => { showCropQA(''); calculateAll(); });
+  crop.addEventListener('change', () => { showCropQA(''); calculateAll(); });
   $('#crops').appendChild(crop);
   activeCropIndex = $$('.crop-card').length - 1;
   renderCropPager();
@@ -1076,11 +1460,14 @@ function getProductData(crop, row) {
   const nPerAcre = productLbsEq * (nPct / 100);
   const pPerAcre = productLbsEq * (pPct / 100);
   const kPerAcre = productLbsEq * (kPct / 100);
+  // Spreadsheet-aligned math:
+  // Units/Acre = Product Rate/Acre × (N-P-K percentage ÷ 100)
+  // Total Units = Units/Acre × Crop Acres
   const nTotal = nPerAcre * cropAcres;
   const pTotal = pPerAcre * cropAcres;
   const kTotal = kPerAcre * cropAcres;
   const notes = $('.notes', row).value.trim();
-  const hasEntry = productName || applicationDate || productRate > 0 || nPct > 0 || pPct > 0 || kPct > 0 || notes;
+  const hasEntry = productName || applicationDate || productRate > 0 || rawValue(row,'.n-pct') || rawValue(row,'.p-pct') || rawValue(row,'.k-pct') || notes;
   return { cropName, cropAcres, productName, applicationDate, productRate, productUnit, productLbsEq, nPct, pPct, kPct, nPerAcre, pPerAcre, kPerAcre, nTotal, pTotal, kTotal, notes, hasEntry };
 }
 
@@ -1133,14 +1520,12 @@ function calculateAll() {
     let otherCount = 0;
 
     $$('.product-row', crop).forEach(row => {
+      refreshEntrySummary(row);
       const p = getProductData(crop, row);
       $('.product-lbs-eq', row).textContent = fmt(p.productLbsEq);
       $('.n-acre', row).textContent = fmt(p.nPerAcre);
       $('.p-acre', row).textContent = fmt(p.pPerAcre);
       $('.k-acre', row).textContent = fmt(p.kPerAcre);
-      $('.n-total', row).textContent = fmt(p.nTotal);
-      $('.p-total', row).textContent = fmt(p.pTotal);
-      $('.k-total', row).textContent = fmt(p.kTotal);
       if (p.hasEntry) productCount++;
       cropNPerAcre += p.nPerAcre;
       cropPPerAcre += p.pPerAcre;
@@ -1151,14 +1536,16 @@ function calculateAll() {
     });
 
     $$('.micro-row', crop).forEach(row => {
+      refreshEntrySummary(row);
       const m = getMicroData(crop, row);
-      $('.micro-total', row).textContent = fmt(m.totalProduct);
+      $('.micro-total', row).textContent = `${fmt(m.totalProduct)} ${m.unit}`;
       if (m.hasEntry) otherCount++;
     });
 
     $$('.amendment-row', crop).forEach(row => {
+      refreshEntrySummary(row);
       const a = getAmendmentData(crop, row);
-      $('.amendment-total', row).textContent = fmt(a.totalProduct);
+      $('.amendment-total', row).textContent = `${fmt(a.totalProduct)} ${a.unit}`;
       if (a.hasEntry) otherCount++;
     });
 
@@ -1261,9 +1648,9 @@ function buildCsv() {
     'Rate Per Acre',
     'Unit',
     'Equivalent lbs Product/Acre',
-    'N %',
-    'P %',
-    'K %',
+    'N Percent',
+    'P Percent',
+    'K Percent',
     'Units N/Acre',
     'Units P/Acre',
     'Units K/Acre',
@@ -1281,6 +1668,7 @@ function buildCsv() {
     let wroteAny = false;
 
     $$('.product-row', crop).forEach(row => {
+      refreshEntrySummary(row);
       const p = getProductData(crop, row);
       if (!cropName && !cropAcres && !p.hasEntry) return;
       wroteAny = true;
@@ -1312,6 +1700,7 @@ function buildCsv() {
     });
 
     $$('.micro-row', crop).forEach(row => {
+      refreshEntrySummary(row);
       const m = getMicroData(crop, row);
       if (!cropName && !cropAcres && !m.hasEntry) return;
       wroteAny = true;
@@ -1328,7 +1717,7 @@ function buildCsv() {
         m.unit,
         m.unit === 'lbs' ? m.ratePerAcre : '',
         '', '', '', '', '', '',
-        fmt(m.totalProduct),
+        `${fmt(m.totalProduct)} ${m.unit}`,
         '', '', '',
         m.contains,
         m.notes
@@ -1336,6 +1725,7 @@ function buildCsv() {
     });
 
     $$('.amendment-row', crop).forEach(row => {
+      refreshEntrySummary(row);
       const a = getAmendmentData(crop, row);
       if (!cropName && !cropAcres && !a.hasEntry) return;
       wroteAny = true;
@@ -1351,7 +1741,7 @@ function buildCsv() {
         a.rate,
         a.unit,
         '', '', '', '', '', '', '',
-        fmt(a.totalProduct),
+        `${fmt(a.totalProduct)} ${a.unit}`,
         '', '', '',
         '',
         a.notes
@@ -1376,6 +1766,8 @@ function requestParentResize() {
 }
 
 function downloadCsv() {
+  const check = validateJourney();
+  if (!check.ok) { showSummaryQA(check.message); showCropQA(check.message); goTo('crops'); if (check.el) check.el.scrollIntoView({behavior:'smooth', block:'center'}); return; }
   const csv = buildCsv();
   const farm = ($('#farmName').value.trim() || 'Farm').replace(/[^a-z0-9-_]+/gi, '-').replace(/^-|-$/g, '');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -1401,17 +1793,18 @@ $('#addCropBtn').addEventListener('click', () => {
   }
 });
 $('#exportCsvBtn').addEventListener('click', downloadCsv);
-['farmName','state','totalAcres','preparedBy'].forEach(id => {
+['farmName','state','totalAcres','preparedBy','cropCount'].forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener('input', calculateAll);
   el.addEventListener('change', calculateAll);
 });
-document.getElementById('cropCount').addEventListener('input', syncCropCardsToCount);
-document.getElementById('cropCount').addEventListener('change', syncCropCardsToCount);
+document.getElementById('cropCount').addEventListener('input', () => { showSetupQA(''); if (document.getElementById('cropCount').value.trim()) syncCropCardsToCount(); });
+document.getElementById('cropCount').addEventListener('change', () => { if (document.getElementById('cropCount').value.trim()) syncCropCardsToCount(); });
 window.addEventListener('load', requestParentResize);
 window.addEventListener('resize', requestParentResize);
 
-syncCropCardsToCount();
+renderCropPager();
+calculateAll();
 
 </script>
 </body>
