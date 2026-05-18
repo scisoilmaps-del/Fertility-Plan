@@ -756,7 +756,7 @@ td[data-label=""] .btn {
 <div class="screen active" id="screen-home">
   <div class="home-content">
     <div class="feature-list">
-      <div class="feature-item"><div class="fi-icon">🏡</div><div class="fi-text"><div class="fi-head">Farm Setup</div><div class="fi-sub">Name, state, total acres, and crop count</div></div></div>
+      <div class="feature-item"><div class="fi-icon">🏡</div><div class="fi-text"><div class="fi-head">Farm Setup</div><div class="fi-sub">Name, state, total acres, total fields, and crop count</div></div></div>
       <div class="feature-item"><div class="fi-icon">🌾</div><div class="fi-text"><div class="fi-head">Crop-by-Crop Entry</div><div class="fi-sub">Add fertilizer, micronutrient, and organic inputs per crop</div></div></div>
       <div class="feature-item"><div class="fi-icon">📊</div><div class="fi-text"><div class="fi-head">Instant Fertility Summary</div><div class="fi-sub">Farm totals, weighted averages, and crop N-P-K</div></div></div>
       <div class="feature-item"><div class="fi-icon">📥</div><div class="fi-text"><div class="fi-head">Export to CSV</div><div class="fi-sub">Download a clean spreadsheet for records</div></div></div>
@@ -787,6 +787,7 @@ td[data-label=""] .btn {
         <div class="field"><label for="farmName">Farm Name</label><input id="farmName" placeholder="Example: ABC Farm" /></div>
         <div class="field"><label for="state">State</label><select id="state"><option value="">Select state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option></select></div>
         <div class="field"><label for="totalAcres">Total Acres</label><input id="totalAcres" type="number" min="0" step="0.01" placeholder="0" /></div>
+        <div class="field"><label for="totalFields">Total Fields</label><input id="totalFields" type="number" min="0" step="1" placeholder="0" inputmode="numeric" /></div>
         <div class="field"><label for="preparedBy">Prepared By</label><input id="preparedBy" placeholder="Optional" /></div>
         <div class="field"><label for="cropCount">Number of Crops</label><input id="cropCount" type="number" min="1" max="10" step="1" placeholder="" inputmode="numeric" /></div>
       </div>
@@ -817,6 +818,8 @@ td[data-label=""] .btn {
       <div class="summary-grid">
         <div class="metric"><div class="label">Crop Acres Entered</div><div class="value" id="sumCropAcres">0.00</div><div class="small">Sum of crop acres</div></div>
         <div class="metric"><div class="label">Remaining Acres</div><div class="value" id="remainingAcres">0.00</div><div class="small">Total acres minus crop acres</div></div>
+        <div class="metric"><div class="label">Crop Fields Entered</div><div class="value" id="sumCropFields">0</div><div class="small">Sum of crop fields</div></div>
+        <div class="metric"><div class="label">Remaining Fields</div><div class="value" id="remainingFields">0</div><div class="small">Total fields minus crop fields</div></div>
         <div class="metric"><div class="label">Total N Units</div><div class="value" id="farmTotalN">0.00</div><div class="small">Across crop acres</div></div>
         <div class="metric"><div class="label">Total P Units</div><div class="value" id="farmTotalP">0.00</div><div class="small">Across crop acres</div></div>
         <div class="metric"><div class="label">Total K Units</div><div class="value" id="farmTotalK">0.00</div><div class="small">Across crop acres</div></div>
@@ -866,6 +869,7 @@ td[data-label=""] .btn {
     <div class="crop-head">
       <div class="field"><label>Crop Name</label><input class="crop-name" placeholder="Corn, soybeans, wheat..." /></div>
       <div class="field"><label>Crop Acres</label><input class="crop-acres" type="number" min="0" step="0.01" placeholder="0" /></div>
+      <div class="field"><label>Crop Fields</label><input class="crop-fields" type="number" min="0" step="1" placeholder="0" inputmode="numeric" /></div>
       <button class="btn danger remove-crop" type="button">Remove Crop</button>
     </div>
     <div class="crop-stats">
@@ -1041,6 +1045,7 @@ function validateSetup() {
   if (!$('#farmName').value.trim()) return { ok:false, message:'Add the farm name before continuing.', el:$('#farmName') };
   if (!$('#state').value) return { ok:false, message:'Select the state before continuing.', el:$('#state') };
   if (num($('#totalAcres').value) <= 0) return { ok:false, message:'Add total farm acres before continuing.', el:$('#totalAcres') };
+  if (num($('#totalFields').value) <= 0) return { ok:false, message:'Add total farm fields before continuing.', el:$('#totalFields') };
   if (!$('#cropCount').value.trim() || desiredCropCount() < 1) return { ok:false, message:'Add the number of crops before continuing.', el:$('#cropCount') };
   return { ok:true, message:'' };
 }
@@ -1064,14 +1069,19 @@ function validateJourney() {
   const crops = $$('.crop-card');
   if (!crops.length) return { ok:false, message:'Add at least one crop before continuing.', el:$('#crops') };
   const totalAcres = num($('#totalAcres').value);
+  const totalFields = num($('#totalFields').value);
   const cropAcresTotal = crops.reduce((sum, crop) => sum + num($('.crop-acres', crop).value), 0);
+  const cropFieldsTotal = crops.reduce((sum, crop) => sum + num($('.crop-fields', crop).value), 0);
+  if (totalFields > 0 && Math.abs(totalFields - cropFieldsTotal) > 0.01) return { ok:false, message: totalFields > cropFieldsTotal ? `Crop fields are ${fmt(totalFields - cropFieldsTotal, 0)} fields below total farm fields.` : `Crop fields exceed total farm fields by ${fmt(cropFieldsTotal - totalFields, 0)} fields.`, el:$('#crops') };
   if (totalAcres > 0 && Math.abs(totalAcres - cropAcresTotal) > 0.01) return { ok:false, message: totalAcres > cropAcresTotal ? `Crop acres are ${fmt(totalAcres - cropAcresTotal)} acres below total farm acres.` : `Crop acres exceed total farm acres by ${fmt(cropAcresTotal - totalAcres)} acres.`, el:$('#crops') };
   let completeEntries = 0;
   for (const [ci, crop] of crops.entries()) {
     const name = $('.crop-name', crop).value.trim();
     const acres = num($('.crop-acres', crop).value);
+    const fields = num($('.crop-fields', crop).value);
     if (!name) { showCrop(ci); return { ok:false, message:'Add a crop name before continuing.', el:$('.crop-name', crop) }; }
     if (acres <= 0) { showCrop(ci); return { ok:false, message:`Add acres for ${name}.`, el:$('.crop-acres', crop) }; }
+    if (fields <= 0) { showCrop(ci); return { ok:false, message:`Add crop fields for ${name}.`, el:$('.crop-fields', crop) }; }
     for (const row of $$('.product-row', crop)) {
       row.classList.remove('needs-attention');
       if (productComplete(row)) completeEntries++;
@@ -1308,13 +1318,17 @@ function buildSummaryHtml() {
   const state = $('#state').value || 'Not selected';
   const preparedBy = $('#preparedBy').value.trim() || 'Not entered';
   const totalAcres = fmt(num($('#totalAcres').value));
+  const totalFields = fmt(num($('#totalFields').value), 0);
   const optionalTotals = summarizeOptionalInputTotals();
   const packTotalText = formatUnitTotals(optionalTotals.packByUnit);
   const organicTotalText = formatUnitTotals(optionalTotals.organicByUnit);
   const summaryMetrics = [
     ['Total Acres', totalAcres],
+    ['Total Fields', totalFields],
     ['Crop Acres', $('#sumCropAcres').textContent],
     ['Remaining Acres', $('#remainingAcres').textContent],
+    ['Crop Fields', $('#sumCropFields').textContent],
+    ['Remaining Fields', $('#remainingFields').textContent],
     ['Total N', $('#farmTotalN').textContent],
     ['Total P', $('#farmTotalP').textContent],
     ['Total K', $('#farmTotalK').textContent],
@@ -1328,12 +1342,13 @@ function buildSummaryHtml() {
   const cropRows = $$('.crop-card').map((crop, index) => {
     const name = $('.crop-name', crop).value.trim() || `Crop ${index + 1}`;
     const acres = fmt(num($('.crop-acres', crop).value));
+    const fields = fmt(num($('.crop-fields', crop).value), 0);
     const n = $('.crop-n-acre', crop).textContent;
     const p = $('.crop-p-acre', crop).textContent;
     const k = $('.crop-k-acre', crop).textContent;
     const products = $('.crop-products', crop).textContent;
     const other = $('.crop-other-products', crop).textContent;
-    return `<div class="crop-summary-row"><div><strong>${name}</strong></div><div>${acres} ac</div><div>${n} N/ac</div><div>${p} P/ac</div><div>${k} K/ac</div><div>${products} fert. / ${other} other</div></div>`;
+    return `<div class="crop-summary-row"><div><strong>${name}</strong></div><div>${acres} ac / ${fields} fields</div><div>${n} N/ac</div><div>${p} P/ac</div><div>${k} K/ac</div><div>${products} fert. / ${other} other</div></div>`;
   }).join('');
   return `<div class="summary-report">
     <div class="summary-card">
@@ -1343,7 +1358,7 @@ function buildSummaryHtml() {
     </div>
     <div class="summary-card">
       <div class="summary-title">Crop Breakdown</div>
-      <div class="crop-summary-row header"><div>Crop</div><div>Acres</div><div>N / Acre</div><div>P / Acre</div><div>K / Acre</div><div>Entries</div></div>
+      <div class="crop-summary-row header"><div>Crop</div><div>Acres / Fields</div><div>N / Acre</div><div>P / Acre</div><div>K / Acre</div><div>Entries</div></div>
       ${cropRows || '<div class="summary-sub">No crop entries yet.</div>'}
     </div>
     <div class="summary-card">
@@ -1393,13 +1408,14 @@ function syncCropCardsToCount() {
   calculateAll();
 }
 
-function addCrop(name = '', acres = '') {
+function addCrop(name = '', acres = '', fields = '') {
   if ($$('.crop-card').length >= MAX_CROPS) return;
   cropCounter++;
   const crop = $('#cropTemplate').content.firstElementChild.cloneNode(true);
   crop.dataset.cropId = String(cropCounter);
   $('.crop-name', crop).value = name;
   $('.crop-acres', crop).value = acres;
+  $('.crop-fields', crop).value = fields;
   $('.fertilizer-body', crop).appendChild(createProductRow());
   $('.add-product', crop).addEventListener('click', () => {
     const blank = $$('.product-row', crop).find(row => !productStarted(row));
@@ -1449,6 +1465,7 @@ function addCrop(name = '', acres = '') {
 function getProductData(crop, row) {
   const cropName = $('.crop-name', crop).value.trim();
   const cropAcres = num($('.crop-acres', crop).value);
+  const cropFields = num($('.crop-fields', crop).value);
   const productName = $('.product-name', row).value.trim();
   const applicationDate = $('.product-date', row).value;
   const productRate = num($('.product-rate', row).value);
@@ -1468,12 +1485,13 @@ function getProductData(crop, row) {
   const kTotal = kPerAcre * cropAcres;
   const notes = $('.notes', row).value.trim();
   const hasEntry = productName || applicationDate || productRate > 0 || rawValue(row,'.n-pct') || rawValue(row,'.p-pct') || rawValue(row,'.k-pct') || notes;
-  return { cropName, cropAcres, productName, applicationDate, productRate, productUnit, productLbsEq, nPct, pPct, kPct, nPerAcre, pPerAcre, kPerAcre, nTotal, pTotal, kTotal, notes, hasEntry };
+  return { cropName, cropAcres, cropFields, productName, applicationDate, productRate, productUnit, productLbsEq, nPct, pPct, kPct, nPerAcre, pPerAcre, kPerAcre, nTotal, pTotal, kTotal, notes, hasEntry };
 }
 
 function getMicroData(crop, row) {
   const cropName = $('.crop-name', crop).value.trim();
   const cropAcres = num($('.crop-acres', crop).value);
+  const cropFields = num($('.crop-fields', crop).value);
   const microName = $('.micro-name', row).value.trim();
   const applicationDate = $('.micro-date', row).value;
   const contains = $('.micro-contains', row).value.trim();
@@ -1482,12 +1500,13 @@ function getMicroData(crop, row) {
   const totalProduct = ratePerAcre * cropAcres;
   const notes = $('.micro-notes', row).value.trim();
   const hasEntry = microName || applicationDate || contains || ratePerAcre > 0 || notes;
-  return { cropName, cropAcres, microName, applicationDate, contains, ratePerAcre, unit, totalProduct, notes, hasEntry };
+  return { cropName, cropAcres, cropFields, microName, applicationDate, contains, ratePerAcre, unit, totalProduct, notes, hasEntry };
 }
 
 function getAmendmentData(crop, row) {
   const cropName = $('.crop-name', crop).value.trim();
   const cropAcres = num($('.crop-acres', crop).value);
+  const cropFields = num($('.crop-fields', crop).value);
   const amendmentType = $('.amendment-type', row).value;
   const applicationDate = $('.amendment-date', row).value;
   const amendmentName = $('.amendment-name', row).value.trim();
@@ -1496,12 +1515,13 @@ function getAmendmentData(crop, row) {
   const totalProduct = rate * cropAcres;
   const notes = $('.amendment-notes', row).value.trim();
   const hasEntry = applicationDate || amendmentName || rate > 0 || notes;
-  return { cropName, cropAcres, amendmentType, applicationDate, amendmentName, rate, unit, totalProduct, notes, hasEntry };
+  return { cropName, cropAcres, cropFields, amendmentType, applicationDate, amendmentName, rate, unit, totalProduct, notes, hasEntry };
 }
 
 function calculateAll() {
   const crops = $$('.crop-card');
   let sumCropAcres = 0;
+  let sumCropFields = 0;
   let farmTotalN = 0;
   let farmTotalP = 0;
   let farmTotalK = 0;
@@ -1509,7 +1529,9 @@ function calculateAll() {
 
   crops.forEach(crop => {
     const cropAcres = num($('.crop-acres', crop).value);
+    const cropFields = num($('.crop-fields', crop).value);
     sumCropAcres += cropAcres;
+    sumCropFields += cropFields;
     let cropNPerAcre = 0;
     let cropPPerAcre = 0;
     let cropKPerAcre = 0;
@@ -1564,9 +1586,13 @@ function calculateAll() {
   });
 
   const totalAcres = num($('#totalAcres').value);
+  const totalFields = num($('#totalFields').value);
   const remaining = totalAcres - sumCropAcres;
+  const remainingFields = totalFields - sumCropFields;
   $('#sumCropAcres').textContent = fmt(sumCropAcres);
   $('#remainingAcres').textContent = fmt(remaining);
+  $('#sumCropFields').textContent = fmt(sumCropFields, 0);
+  $('#remainingFields').textContent = fmt(remainingFields, 0);
   $('#farmTotalN').textContent = fmt(farmTotalN);
   $('#farmTotalP').textContent = fmt(farmTotalP);
   $('#farmTotalK').textContent = fmt(farmTotalK);
@@ -1580,6 +1606,7 @@ function calculateAll() {
   crops.forEach((crop, index) => {
     const cropName = $('.crop-name', crop).value.trim() || `Crop ${index + 1}`;
     const cropAcres = num($('.crop-acres', crop).value);
+    const cropFields = num($('.crop-fields', crop).value);
     const n = $('.crop-n-acre', crop).textContent;
     const p = $('.crop-p-acre', crop).textContent;
     const k = $('.crop-k-acre', crop).textContent;
@@ -1590,16 +1617,25 @@ function calculateAll() {
     tile.innerHTML = `<div class="crop-name-tile"></div><div class="label">Units / Acre</div><div class="value"></div><div class="small"></div>`;
     $('.crop-name-tile', tile).textContent = cropName;
     $('.value', tile).textContent = `${n}-${p}-${k}`;
-    $('.small', tile).textContent = `${fmt(cropAcres)} acres • ${products} fertilizers • ${otherProducts} other`;
+    $('.small', tile).textContent = `${fmt(cropAcres)} acres • ${fmt(cropFields, 0)} fields • ${products} fertilizers • ${otherProducts} other`;
     tiles.appendChild(tile);
   });
 
   const warn = $('#acreWarning');
+  const warnings = [];
   if (totalAcres > 0 && Math.abs(remaining) > 0.01) {
-    warn.classList.remove('hidden');
-    warn.textContent = remaining > 0
+    warnings.push(remaining > 0
       ? `Crop acres are ${fmt(remaining)} acres below total farm acres.`
-      : `Crop acres exceed total farm acres by ${fmt(Math.abs(remaining))} acres.`;
+      : `Crop acres exceed total farm acres by ${fmt(Math.abs(remaining))} acres.`);
+  }
+  if (totalFields > 0 && Math.abs(remainingFields) > 0.01) {
+    warnings.push(remainingFields > 0
+      ? `Crop fields are ${fmt(remainingFields, 0)} fields below total farm fields.`
+      : `Crop fields exceed total farm fields by ${fmt(Math.abs(remainingFields), 0)} fields.`);
+  }
+  if (warnings.length) {
+    warn.classList.remove('hidden');
+    warn.textContent = warnings.join(' ');
   } else {
     warn.classList.add('hidden');
     warn.textContent = '';
@@ -1620,14 +1656,18 @@ function buildCsv() {
   const preparedBy = $('#preparedBy').value.trim();
   const state = $('#state').value;
   const totalAcres = num($('#totalAcres').value);
+  const totalFields = num($('#totalFields').value);
 
   rows.push(['Fertilizer Input Summary']);
   rows.push(['Farm Name', farmName]);
   rows.push(['State', state]);
   rows.push(['Prepared By', preparedBy]);
   rows.push(['Total Farm Acres', totalAcres]);
+  rows.push(['Total Farm Fields', totalFields]);
   rows.push(['Crop Acres Entered', $('#sumCropAcres').textContent]);
   rows.push(['Remaining Acres', $('#remainingAcres').textContent]);
+  rows.push(['Crop Fields Entered', $('#sumCropFields').textContent]);
+  rows.push(['Remaining Fields', $('#remainingFields').textContent]);
   rows.push(['Farm Total N Units', $('#farmTotalN').textContent]);
   rows.push(['Farm Total P Units', $('#farmTotalP').textContent]);
   rows.push(['Farm Total K Units', $('#farmTotalK').textContent]);
@@ -1642,6 +1682,7 @@ function buildCsv() {
     'Input Category',
     'Crop Name',
     'Crop Acres',
+    'Crop Fields',
     'Application Date',
     'Product Or Pack Name',
     'Application Type',
@@ -1665,6 +1706,7 @@ function buildCsv() {
   $$('.crop-card').forEach(crop => {
     const cropName = $('.crop-name', crop).value.trim();
     const cropAcres = $('.crop-acres', crop).value;
+    const cropFields = $('.crop-fields', crop).value;
     let wroteAny = false;
 
     $$('.product-row', crop).forEach(row => {
@@ -1678,6 +1720,7 @@ function buildCsv() {
         'Fertilizer Product',
         cropName,
         cropAcres,
+        cropFields,
         p.applicationDate,
         p.productName,
         '',
@@ -1710,6 +1753,7 @@ function buildCsv() {
         'Fertility Pack / Micronutrients',
         cropName,
         cropAcres,
+        cropFields,
         m.applicationDate,
         m.microName,
         '',
@@ -1735,6 +1779,7 @@ function buildCsv() {
         'Organic Input Type',
         cropName,
         cropAcres,
+        cropFields,
         a.applicationDate,
         a.amendmentName,
         a.amendmentType,
@@ -1749,7 +1794,7 @@ function buildCsv() {
     });
 
     if (!wroteAny && (cropName || cropAcres)) {
-      rows.push([farmName, state, 'Crop Only', cropName, cropAcres, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+      rows.push([farmName, state, 'Crop Only', cropName, cropAcres, cropFields, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
     }
   });
 
@@ -1793,7 +1838,7 @@ $('#addCropBtn').addEventListener('click', () => {
   }
 });
 $('#exportCsvBtn').addEventListener('click', downloadCsv);
-['farmName','state','totalAcres','preparedBy','cropCount'].forEach(id => {
+['farmName','state','totalAcres','totalFields','preparedBy','cropCount'].forEach(id => {
   const el = document.getElementById(id);
   el.addEventListener('input', calculateAll);
   el.addEventListener('change', calculateAll);
