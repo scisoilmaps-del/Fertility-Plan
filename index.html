@@ -275,6 +275,24 @@ td input, td select, td textarea { min-height: 32px; padding: 5px 7px; border-ra
 .crop-card { display: none; }
 .crop-card.active-crop { display: block; }
 
+.edge-guidance {
+  border: 1.5px solid #F0A85A;
+  background: #FFF7EE;
+  color: var(--sci-ink);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.edge-guidance strong {
+  color: #A9561E;
+  font-weight: 850;
+}
+@media (max-width: 560px) {
+  .edge-guidance { font-size: 13px; padding: 10px 12px; }
+}
+
 .hidden { display: none !important; }
 
 @media (max-width: 1100px) {
@@ -782,7 +800,7 @@ td[data-label=""] .btn {
     </div>
     <div id="setupQa" class="qa-box hidden"></div>
     <section class="card">
-      
+      <div class="edge-guidance"><strong>Edge case guidance:</strong> If the same crop has different nutrient management practices, enter each practice system as its own crop count and title. Example: <em>Corn — Manure + Starter</em> and <em>Corn — Synthetic N Plan</em>. This keeps nutrient applications and field-boundary assignments clear without changing the tool logic.</div>
       <div class="input-grid">
         <div class="field"><label for="farmName">Farm Name</label><input id="farmName" placeholder="Example: ABC Farm" /></div>
         <div class="field"><label for="state">State</label><select id="state"><option value="">Select state</option><option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option><option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option><option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option><option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option><option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option><option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option><option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option><option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option><option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option><option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option></select></div>
@@ -974,7 +992,7 @@ td[data-label=""] .btn {
     <td data-label="Units P / Acre" class="readonly p-acre calc-output">0.00</td>
     <td data-label="Units K / Acre" class="readonly k-acre calc-output">0.00</td>
     <td data-label="Notes"><input class="notes" placeholder="Optional" /></td>
-    <td data-label=""><button class="btn danger remove-product" type="button">×</button></td>
+    <td data-label=""><button class="btn danger remove-product" type="button" aria-label="Clear or remove fertilizer product">Clear / Remove</button></td>
   </tr>
 </template>
 
@@ -987,7 +1005,7 @@ td[data-label=""] .btn {
     <td data-label="Unit"><select class="micro-unit"><option>lbs</option><option>Fluid oz</option><option>Tons</option><option>Gallons</option></select></td>
     <td data-label="Total Product" class="readonly micro-total">0.00</td>
     <td data-label="Notes"><input class="micro-notes" placeholder="Optional" /></td>
-    <td data-label=""><button class="btn danger remove-micro" type="button">×</button></td>
+    <td data-label=""><button class="btn danger remove-micro" type="button" aria-label="Remove micronutrient product">Remove</button></td>
   </tr>
 </template>
 
@@ -1000,7 +1018,7 @@ td[data-label=""] .btn {
     <td data-label="Unit"><select class="amendment-unit"><option>Tons</option><option>lbs</option><option>Gallons</option><option>Fluid oz</option></select></td>
     <td data-label="Total Product" class="readonly amendment-total">0.00</td>
     <td data-label="Notes"><input class="amendment-notes" placeholder="Optional" /></td>
-    <td data-label=""><button class="btn danger remove-amendment" type="button">×</button></td>
+    <td data-label=""><button class="btn danger remove-amendment" type="button" aria-label="Remove organic input">Remove</button></td>
   </tr>
 </template>
 
@@ -1658,7 +1676,7 @@ function buildCsv() {
   const totalAcres = num($('#totalAcres').value);
   const totalFields = num($('#totalFields').value);
 
-  rows.push(['Fertilizer Input Summary']);
+  rows.push(['Nutrient Management Plan']);
   rows.push(['Farm Name', farmName]);
   rows.push(['State', state]);
   rows.push(['Prepared By', preparedBy]);
@@ -1819,7 +1837,7 @@ function downloadCsv() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${farm}-Fertilizer-Inputs.csv`;
+  a.download = `${farm}-Nutrient-Management-Plan.csv`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
