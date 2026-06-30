@@ -635,6 +635,16 @@ tr.product-row, tr.micro-row, tr.amendment-row { position: relative; }
 
 
 
+
+/* Safer entry completion controls: primary action first, destructive action separated */
+.entry-action-stack { display:flex; flex-direction:column; gap:6px; min-width:150px; }
+.entry-action-stack .btn { width:100%; min-height:34px; padding:6px 10px; font-size:12px; }
+.entry-danger-divider { height:1px; background: var(--line); margin:2px 0; }
+.entry-complete-note { font-size:10px; color: var(--muted); line-height:1.2; text-align:center; }
+.crop-complete-actions { margin-top:18px; padding-top:14px; border-top:1px solid var(--line); display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.crop-danger-zone { margin-top:10px; padding:10px; border:1px dashed rgba(185,91,66,.45); border-radius:10px; background:rgba(185,91,66,.035); display:flex; justify-content:flex-end; }
+@media (max-width: 760px) { .crop-complete-actions { grid-template-columns:1fr; } .crop-danger-zone { justify-content:stretch; } .crop-danger-zone .btn { width:100%; } }
+
 /* FINAL FIX: compact card rows for fertilizer entry view on desktop and phone */
 .fertilizer-table,
 .micro-table,
@@ -888,7 +898,6 @@ td[data-label=""] .btn {
       <div class="field"><label>Crop Name</label><input class="crop-name" placeholder="Corn, soybeans, wheat..." /></div>
       <div class="field"><label>Crop Acres</label><input class="crop-acres" type="number" min="0" step="0.01" placeholder="0" /></div>
       <div class="field"><label>Crop Fields</label><input class="crop-fields" type="number" min="0" step="1" placeholder="0" inputmode="numeric" /></div>
-      <button class="btn danger remove-crop" type="button">Remove Crop</button>
     </div>
     <div class="crop-stats">
       <div class="stat"><div class="label">N / Acre</div><div class="value crop-n-acre">0.00</div></div>
@@ -975,6 +984,14 @@ td[data-label=""] .btn {
         </table>
       </div>
     </div>
+
+    <div class="crop-complete-actions">
+      <button class="btn ghost done-crop" type="button">Done with Crop</button>
+      <button class="btn-clay crop-summary-btn" type="button">Go to Summary</button>
+    </div>
+    <div class="crop-danger-zone">
+      <button class="btn danger remove-crop" type="button">Remove Crop</button>
+    </div>
   </section>
 </template>
 
@@ -992,7 +1009,7 @@ td[data-label=""] .btn {
     <td data-label="Units P / Acre" class="readonly p-acre calc-output">0.00</td>
     <td data-label="Units K / Acre" class="readonly k-acre calc-output">0.00</td>
     <td data-label="Notes"><input class="notes" placeholder="Optional" /></td>
-    <td data-label=""><button class="btn danger remove-product" type="button" aria-label="Clear or remove fertilizer product">Clear / Remove</button></td>
+    <td data-label="Entry Actions"><div class="entry-action-stack"><button class="btn-clay done-entry" type="button">Complete Entry</button><button class="btn ghost summary-entry" type="button">Go to Summary</button><div class="entry-danger-divider"></div><div class="entry-complete-note">Destructive action</div><button class="btn danger remove-product" type="button" aria-label="Clear this fertilizer entry">Clear this entry</button></div></td>
   </tr>
 </template>
 
@@ -1005,7 +1022,7 @@ td[data-label=""] .btn {
     <td data-label="Unit"><select class="micro-unit"><option>lbs</option><option>Fluid oz</option><option>Tons</option><option>Gallons</option></select></td>
     <td data-label="Total Product" class="readonly micro-total">0.00</td>
     <td data-label="Notes"><input class="micro-notes" placeholder="Optional" /></td>
-    <td data-label=""><button class="btn danger remove-micro" type="button" aria-label="Remove micronutrient product">Remove</button></td>
+    <td data-label="Entry Actions"><div class="entry-action-stack"><button class="btn-clay done-entry" type="button">Complete Entry</button><button class="btn ghost summary-entry" type="button">Go to Summary</button><div class="entry-danger-divider"></div><div class="entry-complete-note">Destructive action</div><button class="btn danger remove-micro" type="button" aria-label="Remove this micronutrient entry">Remove this entry</button></div></td>
   </tr>
 </template>
 
@@ -1018,7 +1035,7 @@ td[data-label=""] .btn {
     <td data-label="Unit"><select class="amendment-unit"><option>Tons</option><option>lbs</option><option>Gallons</option><option>Fluid oz</option></select></td>
     <td data-label="Total Product" class="readonly amendment-total">0.00</td>
     <td data-label="Notes"><input class="amendment-notes" placeholder="Optional" /></td>
-    <td data-label=""><button class="btn danger remove-amendment" type="button" aria-label="Remove organic input">Remove</button></td>
+    <td data-label="Entry Actions"><div class="entry-action-stack"><button class="btn-clay done-entry" type="button">Complete Entry</button><button class="btn ghost summary-entry" type="button">Go to Summary</button><div class="entry-danger-divider"></div><div class="entry-complete-note">Destructive action</div><button class="btn danger remove-amendment" type="button" aria-label="Remove this organic input entry">Remove this entry</button></div></td>
   </tr>
 </template>
 
@@ -1138,7 +1155,7 @@ function addEntrySummary(row) {
   const td = document.createElement('td');
   td.className = 'entry-summary-cell';
   td.colSpan = 20;
-  td.innerHTML = '<div class="entry-summary"><div><div class="entry-summary-title">New Entry</div><div class="entry-summary-sub">Tap edit to open details</div></div><div class="entry-summary-actions"><button class="btn ghost edit-entry" type="button">Edit</button></div></div>';
+  td.innerHTML = '<div class="entry-summary"><div><div class="entry-summary-title">New Entry</div><div class="entry-summary-sub">Tap edit to open details</div></div><div class="entry-summary-actions"><button class="btn ghost edit-entry" type="button">Edit Entry</button></div></div>';
   row.insertBefore(td, row.firstChild);
   $('.edit-entry', row).addEventListener('click', ev => { ev.stopPropagation(); openEntry(row); });
   $('.entry-summary', row).addEventListener('click', ev => { if (ev.target.closest('button')) return; row.classList.toggle('collapsed'); });
@@ -1162,6 +1179,16 @@ function openEntry(row) {
   refreshEntrySummary(row);
   setTimeout(() => row.querySelector('input, select, textarea')?.focus(), 20);
 }
+
+function closeEntry(row) {
+  refreshEntrySummary(row);
+  row.classList.add('collapsed');
+  calculateAll();
+}
+function confirmDestructive(message) {
+  return window.confirm(message || 'This will clear or remove this entry. Continue?');
+}
+
 function collapseCompletedEntries(crop) {
   $$('.product-row', crop).forEach(row => { refreshEntrySummary(row); if (productComplete(row)) row.classList.add('collapsed'); });
   $$('.micro-row', crop).forEach(row => { refreshEntrySummary(row); if (microComplete(row)) row.classList.add('collapsed'); });
@@ -1179,7 +1206,10 @@ function createProductRow() {
   };
   row.addEventListener('input', refresh);
   row.addEventListener('change', refresh);
+  $('.done-entry', row)?.addEventListener('click', () => closeEntry(row));
+  $('.summary-entry', row)?.addEventListener('click', () => { closeEntry(row); goToSummary(); });
   $('.remove-product', row).addEventListener('click', () => {
+    if (!confirmDestructive('This will clear or remove this fertilizer entry. Continue?')) return;
     const body = row.closest('.fertilizer-body');
     if ($$('.product-row', body).length > 1) row.remove();
     else clearRow(row);
@@ -1193,7 +1223,10 @@ function createMicroRow() {
   const row = $('#microTemplate').content.firstElementChild.cloneNode(true);
   row.addEventListener('input', calculateAll);
   row.addEventListener('change', calculateAll);
+  $('.done-entry', row)?.addEventListener('click', () => closeEntry(row));
+  $('.summary-entry', row)?.addEventListener('click', () => { closeEntry(row); goToSummary(); });
   $('.remove-micro', row).addEventListener('click', () => {
+    if (!confirmDestructive('This will remove this micronutrient entry. Continue?')) return;
     const crop = row.closest('.crop-card');
     row.remove();
     updateOptionalPanels(crop);
@@ -1210,7 +1243,10 @@ function createAmendmentRow() {
   const row = $('#amendmentTemplate').content.firstElementChild.cloneNode(true);
   row.addEventListener('input', calculateAll);
   row.addEventListener('change', calculateAll);
+  $('.done-entry', row)?.addEventListener('click', () => closeEntry(row));
+  $('.summary-entry', row)?.addEventListener('click', () => { closeEntry(row); goToSummary(); });
   $('.remove-amendment', row).addEventListener('click', () => {
+    if (!confirmDestructive('This will remove this organic input entry. Continue?')) return;
     const crop = row.closest('.crop-card');
     row.remove();
     updateOptionalPanels(crop);
@@ -1464,7 +1500,10 @@ function addCrop(name = '', acres = '', fields = '') {
     openEntry(row);
     calculateAll();
   });
+  $('.done-crop', crop)?.addEventListener('click', () => { collapseCompletedEntries(crop); showCropQA('Crop entries collapsed. Use Go to Summary when you are ready to review totals.'); });
+  $('.crop-summary-btn', crop)?.addEventListener('click', () => goToSummary());
   $('.remove-crop', crop).addEventListener('click', () => {
+    if (!confirmDestructive('This will remove the whole crop and all entries inside it. Continue?')) return;
     const removedIndex = $$('.crop-card').indexOf(crop);
     crop.remove();
     $('#cropCount').value = String(Math.max(1, $$('.crop-card').length));
