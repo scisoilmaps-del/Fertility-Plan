@@ -776,6 +776,11 @@ td[data-label=""] .btn {
 .summary-report .optional-total-row { grid-template-columns: 1fr 1fr; }
 .summary-report .metric .value { overflow-wrap: anywhere; }
 
+
+/* Match Farm Plan Builder liquid fertilizer inputs. */
+.liquid-density-field.hidden-density { display: none !important; }
+.liquid-density-field input { min-width: 150px; }
+
 </style>
 </head>
 
@@ -918,6 +923,7 @@ td[data-label=""] .btn {
             <th>Application Date</th>
             <th>Rate / Acre</th>
             <th>Unit</th>
+            <th>Product Density (lb/gal)</th>
             <th class="calc-output">Equivalent lbs / Acre</th>
             <th>N %</th>
             <th>P %</th>
@@ -1001,6 +1007,7 @@ td[data-label=""] .btn {
     <td data-label="Application Date"><input class="application-date product-date" type="date" /></td>
     <td data-label="Rate / Acre"><input class="product-rate" type="number" min="0" step="0.01" placeholder="0" /></td>
     <td data-label="Unit"><select class="product-unit"><option>lbs</option><option>Tons</option><option>Gallons</option><option>Fluid oz</option></select></td>
+    <td data-label="Product Density (lb/gal)" class="liquid-density-field hidden-density"><input class="product-density" type="number" min="0" step="0.01" placeholder="Required for liquids" /></td>
     <td data-label="Equivalent lbs / Acre" class="readonly product-lbs-eq calc-output">0.00</td>
     <td data-label="N %"><input class="n-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
     <td data-label="P %"><input class="p-pct" type="number" min="0" max="100" step="0.01" placeholder="0" /></td>
@@ -1056,10 +1063,23 @@ function clampPct(value) {
   return Math.min(100, Math.max(0, num(value)));
 }
 
-function poundsEquivalent(rate, unit) {
+function poundsEquivalent(rate, unit, density) {
   if (unit === 'lbs') return rate;
   if (unit === 'Tons') return rate * 2000;
+  if (unit === 'Gallons') return rate * density;
+  if (unit === 'Fluid oz') return (rate / 128) * density;
   return 0;
+}
+
+function isLiquidProductUnit(unit) {
+  return unit === 'Gallons' || unit === 'Fluid oz';
+}
+
+function updateProductDensityVisibility(row) {
+  const unit = $('.product-unit', row)?.value || 'lbs';
+  const cell = $('.liquid-density-field', row);
+  if (!cell) return;
+  cell.classList.toggle('hidden-density', !isLiquidProductUnit(unit));
 }
 
 
@@ -1084,7 +1104,7 @@ function validateSetup() {
   if (!$('#cropCount').value.trim() || desiredCropCount() < 1) return { ok:false, message:'Add the number of crops before continuing.', el:$('#cropCount') };
   return { ok:true, message:'' };
 }
-function productStarted(row) { return !!(rawValue(row,'.product-name') || rawValue(row,'.product-date') || rawValue(row,'.product-rate') || rawValue(row,'.n-pct') || rawValue(row,'.p-pct') || rawValue(row,'.k-pct') || rawValue(row,'.notes')); }
+function productStarted(row) { return !!(rawValue(row,'.product-name') || rawValue(row,'.product-date') || rawValue(row,'.product-rate') || rawValue(row,'.product-density') || rawValue(row,'.n-pct') || rawValue(row,'.p-pct') || rawValue(row,'.k-pct') || rawValue(row,'.notes')); }
 function productComplete(row) {
   const nRaw = rawValue(row,'.n-pct');
   const pRaw = rawValue(row,'.p-pct');
@@ -1092,7 +1112,9 @@ function productComplete(row) {
   const n = pctValue(nRaw);
   const p = pctValue(pRaw);
   const k = pctValue(kRaw);
-  return !!(rawValue(row,'.product-name') && rawValue(row,'.product-date') && num(rawValue(row,'.product-rate')) > 0 && validPctRaw(nRaw) && validPctRaw(pRaw) && validPctRaw(kRaw) && (n + p + k) > 0);
+  const unit = rawValue(row,'.product-unit') || 'lbs';
+  const densityComplete = !isLiquidProductUnit(unit) || num(rawValue(row,'.product-density')) > 0;
+  return !!(rawValue(row,'.product-name') && rawValue(row,'.product-date') && num(rawValue(row,'.product-rate')) > 0 && densityComplete && validPctRaw(nRaw) && validPctRaw(pRaw) && validPctRaw(kRaw) && (n + p + k) > 0);
 }
 function microStarted(row) { return !!(rawValue(row,'.micro-name') || rawValue(row,'.micro-date') || rawValue(row,'.micro-contains') || rawValue(row,'.micro-rate') || rawValue(row,'.micro-notes')); }
 function microComplete(row) { return !!(rawValue(row,'.micro-name') && rawValue(row,'.micro-date') && rawValue(row,'.micro-contains') && num(rawValue(row,'.micro-rate')) > 0); }
@@ -1120,7 +1142,7 @@ function validateJourney() {
     for (const row of $$('.product-row', crop)) {
       row.classList.remove('needs-attention');
       if (productComplete(row)) completeEntries++;
-      else if (productStarted(row)) { showCrop(ci); row.classList.add('needs-attention'); openEntry(row); return { ok:false, message:`Finish the incomplete fertilizer entry for ${name}: product, date, rate/acre, and at least one N-P-K percentage above 0 are required. Blank P or K is treated as 0. Keep percentages from 0 to 100.`, el:row }; }
+      else if (productStarted(row)) { showCrop(ci); row.classList.add('needs-attention'); openEntry(row); return { ok:false, message:`Finish the incomplete fertilizer entry for ${name}: product, date, rate/acre, and at least one N-P-K percentage above 0 are required. For gallons or fluid ounces, product density in lb/gal is also required. Blank P or K is treated as 0. Keep percentages from 0 to 100.`, el:row }; }
     }
     for (const row of $$('.micro-row', crop)) {
       row.classList.remove('needs-attention');
@@ -1527,7 +1549,8 @@ function getProductData(crop, row) {
   const applicationDate = $('.product-date', row).value;
   const productRate = num($('.product-rate', row).value);
   const productUnit = $('.product-unit', row).value;
-  const productLbsEq = poundsEquivalent(productRate, productUnit);
+  const productLbsPerGallon = num($('.product-density', row)?.value);
+  const productLbsEq = poundsEquivalent(productRate, productUnit, productLbsPerGallon);
   const nPct = clampPct($('.n-pct', row).value);
   const pPct = clampPct($('.p-pct', row).value);
   const kPct = clampPct($('.k-pct', row).value);
@@ -1541,8 +1564,8 @@ function getProductData(crop, row) {
   const pTotal = pPerAcre * cropAcres;
   const kTotal = kPerAcre * cropAcres;
   const notes = $('.notes', row).value.trim();
-  const hasEntry = productName || applicationDate || productRate > 0 || rawValue(row,'.n-pct') || rawValue(row,'.p-pct') || rawValue(row,'.k-pct') || notes;
-  return { cropName, cropAcres, cropFields, productName, applicationDate, productRate, productUnit, productLbsEq, nPct, pPct, kPct, nPerAcre, pPerAcre, kPerAcre, nTotal, pTotal, kTotal, notes, hasEntry };
+  const hasEntry = productName || applicationDate || productRate > 0 || productLbsPerGallon > 0 || rawValue(row,'.n-pct') || rawValue(row,'.p-pct') || rawValue(row,'.k-pct') || notes;
+  return { cropName, cropAcres, cropFields, productName, applicationDate, productRate, productUnit, productLbsPerGallon, productLbsEq, nPct, pPct, kPct, nPerAcre, pPerAcre, kPerAcre, nTotal, pTotal, kTotal, notes, hasEntry };
 }
 
 function getMicroData(crop, row) {
@@ -1600,6 +1623,7 @@ function calculateAll() {
 
     $$('.product-row', crop).forEach(row => {
       refreshEntrySummary(row);
+      updateProductDensityVisibility(row);
       const p = getProductData(crop, row);
       $('.product-lbs-eq', row).textContent = fmt(p.productLbsEq);
       $('.n-acre', row).textContent = fmt(p.nPerAcre);
@@ -1745,6 +1769,7 @@ function buildCsv() {
     'Application Type',
     'Rate Per Acre',
     'Unit',
+    'Product Density (lb/gal)',
     'Equivalent lbs Product/Acre',
     'N Percent',
     'P Percent',
@@ -1768,6 +1793,7 @@ function buildCsv() {
 
     $$('.product-row', crop).forEach(row => {
       refreshEntrySummary(row);
+      updateProductDensityVisibility(row);
       const p = getProductData(crop, row);
       if (!cropName && !cropAcres && !p.hasEntry) return;
       wroteAny = true;
@@ -1783,6 +1809,7 @@ function buildCsv() {
         '',
         p.productRate,
         p.productUnit,
+        isLiquidProductUnit(p.productUnit) ? p.productLbsPerGallon : '',
         fmt(p.productLbsEq),
         p.nPct,
         p.pPct,
@@ -1816,6 +1843,7 @@ function buildCsv() {
         '',
         m.ratePerAcre,
         m.unit,
+        '',
         m.unit === 'lbs' ? m.ratePerAcre : '',
         '', '', '', '', '', '',
         `${fmt(m.totalProduct)} ${m.unit}`,
@@ -1842,7 +1870,7 @@ function buildCsv() {
         a.amendmentType,
         a.rate,
         a.unit,
-        '', '', '', '', '', '', '',
+        '', '', '', '', '', '', '', '',
         `${fmt(a.totalProduct)} ${a.unit}`,
         '', '', '',
         '',
@@ -1851,7 +1879,7 @@ function buildCsv() {
     });
 
     if (!wroteAny && (cropName || cropAcres)) {
-      rows.push([farmName, state, 'Crop Only', cropName, cropAcres, cropFields, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
+      rows.push([farmName, state, 'Crop Only', cropName, cropAcres, cropFields, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '']);
     }
   });
 
